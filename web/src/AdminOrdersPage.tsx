@@ -124,8 +124,8 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {list.map((o) => (
-                  <tr key={o.id}>
+                {list.map((o, index) => (
+                  <tr key={o.id} style={tableRowStyle(index)}>
                     <td style={tdStyle}><code style={codeStyle}>{o.out_trade_no}</code></td>
                     <td style={tdStyle}>
                       {o.user_email
@@ -556,6 +556,18 @@ const tableWrapStyle: React.CSSProperties = {
 const tableStyle: React.CSSProperties = {
   width: '100%',
   borderCollapse: 'collapse',
+};
+
+function tableRowStyle(index: number): React.CSSProperties {
+  return index % 2 === 0 ? tableRowLightStyle : tableRowDarkStyle;
+}
+
+const tableRowLightStyle: React.CSSProperties = {
+  background: cssVar('bgSurface'),
+};
+
+const tableRowDarkStyle: React.CSSProperties = {
+  background: cssVar('bgHover'),
 };
 
 const thStyle: React.CSSProperties = {

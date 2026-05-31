@@ -49,28 +49,28 @@ func BuildPluginInfo() sdk.PluginInfo {
 		FrontendPages: []sdk.FrontendPage{
 			{
 				Path:        "/recharge",
-				Title:       "充值",
+				Title:       "plugin_pages.payment_epay.recharge",
 				Icon:        "wallet",
 				Description: "账户余额充值",
 				Audience:    "user",
 			},
 			{
 				Path:        "/orders",
-				Title:       "充值记录",
+				Title:       "plugin_pages.payment_epay.orders",
 				Icon:        "history",
 				Description: "我的充值订单",
 				Audience:    "user",
 			},
 			{
 				Path:        "/admin/orders",
-				Title:       "支付订单",
+				Title:       "plugin_pages.payment_epay.admin_orders",
 				Icon:        "receipt",
 				Description: "全量订单监控",
 				Audience:    "admin",
 			},
 			{
 				Path:        "/admin/providers",
-				Title:       "支付服务商",
+				Title:       "plugin_pages.payment_epay.providers",
 				Icon:        "settings",
 				Description: "管理虎皮椒/彩虹/支付宝官方/微信官方等服务商",
 				Audience:    "admin",

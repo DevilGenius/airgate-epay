@@ -146,8 +146,8 @@ export default function OrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((o) => (
-                  <tr key={o.id}>
+                {orders.map((o, index) => (
+                  <tr key={o.id} style={tableRowStyle(index)}>
                     <td style={tdStyle}><code style={codeStyle}>{o.out_trade_no}</code></td>
                     <td style={{ ...tdStyle, fontWeight: 600 }}>¥{o.amount.toFixed(2)}</td>
                     <td style={tdStyle}>{methodLabel(o.method)}</td>
@@ -234,6 +234,18 @@ const tableWrapStyle: React.CSSProperties = {
 const tableStyle: React.CSSProperties = {
   width: '100%',
   borderCollapse: 'collapse',
+};
+
+function tableRowStyle(index: number): React.CSSProperties {
+  return index % 2 === 0 ? tableRowLightStyle : tableRowDarkStyle;
+}
+
+const tableRowLightStyle: React.CSSProperties = {
+  background: cssVar('bgSurface'),
+};
+
+const tableRowDarkStyle: React.CSSProperties = {
+  background: cssVar('bgHover'),
 };
 
 const thStyle: React.CSSProperties = {

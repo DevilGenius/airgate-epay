@@ -36,22 +36,22 @@ config:
     description: 订单创建后多少分钟内未支付自动过期
 frontend_pages:
   - path: /recharge
-    title: 充值
+    title: plugin_pages.payment_epay.recharge
     icon: wallet
     description: 账户余额充值
     audience: user
   - path: /orders
-    title: 充值记录
+    title: plugin_pages.payment_epay.orders
     icon: history
     description: 我的充值订单
     audience: user
   - path: /admin/orders
-    title: 支付订单
+    title: plugin_pages.payment_epay.admin_orders
     icon: receipt
     description: 全量订单监控
     audience: admin
   - path: /admin/providers
-    title: 支付服务商
+    title: plugin_pages.payment_epay.providers
     icon: settings
     description: 管理虎皮椒/彩虹/支付宝官方/微信官方等服务商
     audience: admin
