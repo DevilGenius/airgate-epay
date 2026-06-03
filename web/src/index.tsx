@@ -11,6 +11,7 @@ import RechargePage from './RechargePage';
 import OrdersPage from './OrdersPage';
 import AdminOrdersPage from './AdminOrdersPage';
 import AdminProvidersPage from './AdminProvidersPage';
+import './admin-ui.css';
 import type { ComponentType } from 'react';
 
 interface PluginFrontendModule {

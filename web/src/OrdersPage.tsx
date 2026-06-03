@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
-import { cssVar } from '@doudou-start/airgate-theme';
 import { api, type Order } from './api';
+import {
+  Button,
+  MethodChips,
+  Modal,
+  PageShell,
+  Panel,
+  PaymentQrPanel,
+  StatusBadge,
+  TableState,
+  type Tone,
+} from './admin-ui';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -16,7 +26,7 @@ export default function OrdersPage() {
     setLoading(true);
     api.listOrders(100)
       .then((res) => setOrders(res.list || []))
-      .catch((e) => setErr(String(e?.message || e)))
+      .catch((error) => setErr(errorMessage(error)))
       .finally(() => setLoading(false));
   };
 
@@ -53,7 +63,9 @@ export default function OrdersPage() {
         if (fresh.status !== 'pending') {
           reload();
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }, 3000);
     return () => {
       if (pollRef.current) { window.clearInterval(pollRef.current); pollRef.current = null; }
@@ -69,113 +81,185 @@ export default function OrdersPage() {
     setQrDataUrl(null);
   };
 
-  if (loading) return <div style={containerStyle}><div style={hintStyle}>加载中...</div></div>;
-  if (err) return <div style={containerStyle}><div style={{ ...hintStyle, color: cssVar('danger') }}>加载失败: {err}</div></div>;
-
   return (
-    <div style={containerStyle}>
-      {/* QR code modal for continue-pay */}
-      {payingOrder && (
-        <div style={overlayStyle} onClick={closePayModal}>
-          <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-            {payingOrder.status === 'paid' ? (
-              <>
-                <h3 style={{ margin: '0 0 12px', color: cssVar('success') }}>支付成功</h3>
-                <p style={{ margin: 0, color: cssVar('text'), fontSize: 14 }}>
-                  订单 <code style={codeStyle}>{payingOrder.out_trade_no}</code> 已支付{' '}
-                  <strong>¥{payingOrder.amount.toFixed(2)}</strong>
-                </p>
-                <button style={{ ...btnStyle, marginTop: 16 }} onClick={closePayModal}>关闭</button>
-              </>
-            ) : payingOrder.status === 'pending' ? (
-              <>
-                <h3 style={{ margin: '0 0 12px', color: cssVar('text') }}>扫码付款</h3>
-                {qrDataUrl ? (
-                  <img src={qrDataUrl} alt="付款二维码" style={{ width: 240, height: 240, borderRadius: 8 }} />
-                ) : (
-                  <div style={{ width: 240, height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cssVar('textTertiary'), border: `1px solid ${cssVar('glassBorder')}`, borderRadius: 8 }}>
-                    生成二维码中...
-                  </div>
-                )}
-                <div style={{ marginTop: 12, fontWeight: 600, fontSize: 20, color: cssVar('text') }}>¥ {payingOrder.amount.toFixed(2)}</div>
-                <div style={{ color: cssVar('textSecondary'), fontSize: 13, marginTop: 4 }}>
-                  请使用 {methodLabel(payingOrder.method)} 扫码完成付款
-                </div>
-                <div style={{ marginTop: 6, color: cssVar('textTertiary'), fontSize: 12 }}>
-                  订单号：<code style={codeStyle}>{payingOrder.out_trade_no}</code>
-                </div>
-                <p style={{ color: cssVar('textTertiary'), fontSize: 12, marginTop: 12, marginBottom: 0 }}>
-                  支付完成后将自动刷新（每 3 秒检查一次）
-                </p>
-                {payingOrder.payment_url && (
-                  <p style={{ fontSize: 12, marginTop: 6, marginBottom: 0 }}>
-                    扫码不便？{' '}
-                    <a href={payingOrder.payment_url} target="_blank" rel="noreferrer" style={{ color: cssVar('primary'), textDecoration: 'none' }}>
-                      点此在新窗口打开付款页 →
-                    </a>
-                  </p>
-                )}
-                <button style={{ ...btnSecondaryStyle, marginTop: 16 }} onClick={closePayModal}>取消</button>
-              </>
-            ) : (
-              <>
-                <h3 style={{ margin: '0 0 12px', color: cssVar('textSecondary') }}>订单已{statusLabel(payingOrder.status)}</h3>
-                <p style={{ margin: 0, color: cssVar('textSecondary'), fontSize: 14 }}>该订单无法继续支付，请重新发起充值。</p>
-                <button style={{ ...btnStyle, marginTop: 16 }} onClick={closePayModal}>关闭</button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+    <PageShell>
+      <div className="ag-epay-page-body ag-epay-user-page-body">
+        {payingOrder ? (
+          <ContinuePayModal
+            onClose={closePayModal}
+            order={payingOrder}
+            qrDataUrl={qrDataUrl}
+          />
+        ) : null}
 
-      <div style={panelStyle}>
-        {orders.length === 0 ? (
-          <p style={emptyStyle}>暂无充值记录</p>
-        ) : (
-          <div style={tableWrapStyle}>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>订单号</th>
-                  <th style={thStyle}>金额</th>
-                  <th style={thStyle}>支付方式</th>
-                  <th style={thStyle}>状态</th>
-                  <th style={thStyle}>创建时间</th>
-                  <th style={thStyle}>支付时间</th>
-                  <th style={thStyle}>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o, index) => (
-                  <tr key={o.id} style={tableRowStyle(index)}>
-                    <td style={tdStyle}><code style={codeStyle}>{o.out_trade_no}</code></td>
-                    <td style={{ ...tdStyle, fontWeight: 600 }}>¥{o.amount.toFixed(2)}</td>
-                    <td style={tdStyle}>{methodLabel(o.method)}</td>
-                    <td style={{ ...tdStyle, color: statusColor(o.status), fontWeight: 600 }}>{statusLabel(o.status)}</td>
-                    <td style={{ ...tdStyle, color: cssVar('textSecondary') }}>{formatTime(o.created_at)}</td>
-                    <td style={{ ...tdStyle, color: cssVar('textSecondary') }}>{o.paid_at ? formatTime(o.paid_at) : '-'}</td>
-                    <td style={tdStyle}>
-                      {o.status === 'pending' && (o.qr_code_content || o.payment_url) ? (
-                        <button style={continuePayBtnStyle} onClick={() => handleContinuePay(o)}>
-                          继续支付
-                        </button>
-                      ) : null}
-                    </td>
+        <Panel title="充值记录">
+          <div className="ag-epay-table-shell">
+            <div className="ag-epay-table-scroll">
+              <table aria-label="充值记录" className="ag-epay-table ag-epay-user-orders-table" data-slot="table">
+                <thead data-slot="thead">
+                  <tr data-slot="tr">
+                    <th data-slot="th" scope="col">订单号</th>
+                    <th data-slot="th" scope="col">金额</th>
+                    <th data-slot="th" scope="col">支付方式</th>
+                    <th data-slot="th" scope="col">状态</th>
+                    <th data-slot="th" scope="col">创建时间</th>
+                    <th data-slot="th" scope="col">支付时间</th>
+                    <th data-slot="th" scope="col">操作</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody data-slot="tbody">
+                  {renderOrdersTable({
+                    err,
+                    loading,
+                    onContinuePay: handleContinuePay,
+                    orders,
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
+        </Panel>
       </div>
-    </div>
+    </PageShell>
   );
 }
 
-function methodLabel(m: string): string {
-  return ({ alipay: '支付宝', wxpay: '微信支付' } as Record<string, string>)[m] || m || '-';
+function ContinuePayModal({
+  onClose,
+  order,
+  qrDataUrl,
+}: {
+  onClose: () => void;
+  order: Order;
+  qrDataUrl: string | null;
+}) {
+  if (order.status === 'paid') {
+    return (
+      <Modal
+        footer={<Button variant="primary" onClick={onClose}>关闭</Button>}
+        onClose={onClose}
+        title="支付成功"
+      >
+        <p className="ag-epay-result-message">
+          订单 <code className="ag-epay-code">{order.out_trade_no}</code> 已支付{' '}
+          <span className="ag-epay-result-amount">¥{order.amount.toFixed(2)}</span>
+        </p>
+      </Modal>
+    );
+  }
+
+  if (order.status === 'pending') {
+    return (
+      <Modal
+        footer={<Button onClick={onClose}>取消</Button>}
+        onClose={onClose}
+        title="扫码付款"
+      >
+        <PaymentQrPanel
+          amountLabel={`¥ ${order.amount.toFixed(2)}`}
+          methodLabel={methodLabel(order.method)}
+          note="支付完成后将自动刷新（每 3 秒检查一次）"
+          orderNo={order.out_trade_no}
+          paymentUrl={order.payment_url}
+          qrDataUrl={qrDataUrl}
+        />
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal
+      footer={<Button variant="primary" onClick={onClose}>关闭</Button>}
+      onClose={onClose}
+      title={`订单已${statusLabel(order.status)}`}
+    >
+      <p className="ag-epay-result-message ag-epay-result-message--muted">
+        该订单无法继续支付，请重新发起充值。
+      </p>
+    </Modal>
+  );
 }
-function statusLabel(s: string): string {
+
+function renderOrdersTable({
+  err,
+  loading,
+  onContinuePay,
+  orders,
+}: {
+  err: string | null;
+  loading: boolean;
+  onContinuePay: (order: Order) => void;
+  orders: Order[];
+}) {
+  if (err) {
+    return (
+      <tr className="ag-epay-table-empty-row" data-slot="tr">
+        <td colSpan={7} data-slot="td">
+          <TableState tone="danger">加载失败: {err}</TableState>
+        </td>
+      </tr>
+    );
+  }
+
+  if (loading && orders.length === 0) {
+    return (
+      <tr className="ag-epay-table-empty-row" data-slot="tr">
+        <td colSpan={7} data-slot="td">
+          <TableState>加载中...</TableState>
+        </td>
+      </tr>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <tr className="ag-epay-table-empty-row" data-slot="tr">
+        <td colSpan={7} data-slot="td">
+          <TableState>暂无充值记录</TableState>
+        </td>
+      </tr>
+    );
+  }
+
+  return orders.map((order) => {
+    const canContinuePay = order.status === 'pending' && Boolean(order.qr_code_content || order.payment_url);
+    return (
+      <tr key={order.id} data-slot="tr">
+        <td data-slot="td">
+          <code className="ag-epay-code">{order.out_trade_no}</code>
+        </td>
+        <td data-slot="td">
+          <span className="ag-epay-amount">¥{order.amount.toFixed(2)}</span>
+        </td>
+        <td data-slot="td">
+          <MethodChips format={methodLabel} methods={[order.method].filter(Boolean)} />
+        </td>
+        <td data-slot="td">
+          <StatusBadge tone={statusTone(order.status)}>{statusLabel(order.status)}</StatusBadge>
+        </td>
+        <td data-slot="td">
+          <span className="ag-epay-code">{formatTime(order.created_at)}</span>
+        </td>
+        <td data-slot="td">
+          {order.paid_at ? <span className="ag-epay-code">{formatTime(order.paid_at)}</span> : <span className="ag-epay-text-muted">-</span>}
+        </td>
+        <td data-slot="td">
+          {canContinuePay ? (
+            <Button onClick={() => onContinuePay(order)}>继续支付</Button>
+          ) : (
+            <span className="ag-epay-text-muted">-</span>
+          )}
+        </td>
+      </tr>
+    );
+  });
+}
+
+function methodLabel(method: string): string {
+  return ({ alipay: '支付宝', wxpay: '微信支付', qqpay: 'QQ 钱包' } as Record<string, string>)[method] || method || '-';
+}
+
+function statusLabel(status: string): string {
   return ({
     pending: '待支付',
     paid: '已支付',
@@ -183,148 +267,34 @@ function statusLabel(s: string): string {
     failed: '失败',
     cancelled: '已取消',
     refunded: '已退款',
-  } as Record<string, string>)[s] || s;
+  } as Record<string, string>)[status] || status;
 }
-function statusColor(s: string): string {
+
+function statusTone(status: string): Tone {
   return ({
-    pending: cssVar('warning'),
-    paid: cssVar('success'),
-    expired: cssVar('textTertiary'),
-    failed: cssVar('danger'),
-    cancelled: cssVar('textTertiary'),
-    refunded: cssVar('textTertiary'),
-  } as Record<string, string>)[s] || 'inherit';
-}
-function formatTime(t: string): string {
-  try { return new Date(t).toLocaleString(); } catch { return t; }
+    pending: 'warning',
+    paid: 'success',
+    expired: 'muted',
+    failed: 'danger',
+    cancelled: 'muted',
+    refunded: 'muted',
+  } as Record<string, Tone>)[status] || 'muted';
 }
 
-const containerStyle: React.CSSProperties = {
-  maxWidth: 960,
-  margin: '0 auto',
-  padding: '24px 24px 48px',
-  color: cssVar('text'),
-};
-
-const hintStyle: React.CSSProperties = {
-  padding: '40px 0',
-  textAlign: 'center',
-  color: cssVar('textSecondary'),
-};
-
-const panelStyle: React.CSSProperties = {
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusLg'),
-  background: cssVar('bgElevated'),
-  padding: '8px 0',
-  overflow: 'hidden',
-};
-
-const emptyStyle: React.CSSProperties = {
-  color: cssVar('textTertiary'),
-  textAlign: 'center',
-  padding: '40px 0',
-  fontSize: 14,
-};
-
-const tableWrapStyle: React.CSSProperties = {
-  overflowX: 'auto',
-};
-
-const tableStyle: React.CSSProperties = {
-  width: '100%',
-  borderCollapse: 'collapse',
-};
-
-function tableRowStyle(index: number): React.CSSProperties {
-  return index % 2 === 0 ? tableRowLightStyle : tableRowDarkStyle;
+function formatTime(value: string): string {
+  try {
+    return new Date(value).toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return value;
+  }
 }
 
-const tableRowLightStyle: React.CSSProperties = {
-  background: cssVar('bgSurface'),
-};
-
-const tableRowDarkStyle: React.CSSProperties = {
-  background: cssVar('bgHover'),
-};
-
-const thStyle: React.CSSProperties = {
-  textAlign: 'left',
-  padding: '10px 16px',
-  borderBottom: `1px solid ${cssVar('glassBorder')}`,
-  background: cssVar('bgSurface'),
-  color: cssVar('textSecondary'),
-  fontWeight: 600,
-  fontSize: 12,
-  textTransform: 'uppercase',
-  letterSpacing: '0.04em',
-  whiteSpace: 'nowrap',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '12px 16px',
-  borderBottom: `1px solid ${cssVar('glassBorder')}`,
-  fontSize: 13,
-  color: cssVar('text'),
-  whiteSpace: 'nowrap',
-};
-
-const codeStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontFamily: cssVar('fontMono'),
-  color: cssVar('textSecondary'),
-};
-
-const overlayStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: 'rgba(0,0,0,0.45)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 1000,
-};
-
-const modalStyle: React.CSSProperties = {
-  background: cssVar('bgElevated'),
-  borderRadius: cssVar('radiusLg'),
-  padding: '32px',
-  textAlign: 'center',
-  minWidth: 320,
-  maxWidth: 400,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-};
-
-const btnStyle: React.CSSProperties = {
-  padding: '8px 24px',
-  border: 'none',
-  borderRadius: cssVar('radiusMd'),
-  background: cssVar('primary'),
-  color: '#fff',
-  fontSize: 14,
-  cursor: 'pointer',
-};
-
-const btnSecondaryStyle: React.CSSProperties = {
-  padding: '8px 24px',
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusMd'),
-  background: 'transparent',
-  color: cssVar('textSecondary'),
-  fontSize: 14,
-  cursor: 'pointer',
-};
-
-const continuePayBtnStyle: React.CSSProperties = {
-  padding: '4px 12px',
-  border: `1px solid ${cssVar('primary')}`,
-  borderRadius: cssVar('radiusMd'),
-  background: 'transparent',
-  color: cssVar('primary'),
-  fontSize: 12,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-};
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}

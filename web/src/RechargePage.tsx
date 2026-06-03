@@ -1,7 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import QRCode from 'qrcode';
-import { cssVar } from '@doudou-start/airgate-theme';
-import { api, type Order, type MethodInfo } from './api';
+import { api, type MethodInfo, type Order } from './api';
+import {
+  Button,
+  FormField,
+  PageShell,
+  Panel,
+  PaymentQrPanel,
+  TableState,
+} from './admin-ui';
+
+const PRESET_AMOUNTS = [10, 30, 50, 100, 200, 500];
 
 /**
  * RechargePage 充值页面（用户级独立页面）
@@ -35,7 +44,7 @@ export default function RechargePage() {
         setMethods(res.methods || []);
         if (res.methods?.length) setMethod(res.methods[0].key);
       })
-      .catch((e) => setMethodsErr(String(e?.message || e)))
+      .catch((err) => setMethodsErr(errorMessage(err)))
       .finally(() => setMethodsLoading(false));
   }, []);
 
@@ -102,11 +111,11 @@ export default function RechargePage() {
     }
     setSubmitting(true);
     try {
-      const o = await api.createOrder({ amount, method, subject: 'AirGate 余额充值' });
-      setOrder(o);
+      const nextOrder = await api.createOrder({ amount, method, subject: 'AirGate 余额充值' });
+      setOrder(nextOrder);
       // 不再 window.open 跳转新窗口；二维码会由上面的 useEffect 自动渲染到当前页
-    } catch (e) {
-      setError(String((e as Error).message || e));
+    } catch (err) {
+      setError(errorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -117,332 +126,192 @@ export default function RechargePage() {
     setError(null);
   };
 
-  // ========== 渲染 ==========
-
   if (methodsLoading) {
-    return <div style={containerStyle}><div style={hintStyle}>加载中...</div></div>;
-  }
-  if (methodsErr) {
-    return <div style={containerStyle}><div style={{ ...hintStyle, color: cssVar('danger') }}>加载支付方式失败: {methodsErr}</div></div>;
-  }
-  if (methods.length === 0) {
     return (
-      <div style={containerStyle}>
-        <div style={panelStyle}>
-          <p style={{ color: cssVar('textSecondary'), margin: 0, textAlign: 'center' }}>
-            充值功能暂未开放，请联系管理员。
-          </p>
+      <RechargeFrame>
+        <div className="ag-epay-user-card">
+          <TableState>加载中...</TableState>
         </div>
-      </div>
+      </RechargeFrame>
     );
   }
 
-  // 已创建订单：付款引导态
+  if (methodsErr) {
+    return (
+      <RechargeFrame>
+        <div className="ag-epay-user-card">
+          <TableState tone="danger">加载支付方式失败: {methodsErr}</TableState>
+        </div>
+      </RechargeFrame>
+    );
+  }
+
+  if (methods.length === 0) {
+    return (
+      <RechargeFrame>
+        <Panel title="账户充值">
+          <div className="ag-epay-user-card">
+            <TableState>充值功能暂未开放，请联系管理员。</TableState>
+          </div>
+        </Panel>
+      </RechargeFrame>
+    );
+  }
+
   if (order) {
     if (order.status === 'paid') {
       return (
-        <div style={containerStyle}>
-          <h2 style={titleStyle}>充值成功</h2>
-          <div style={panelStyle}>
-            <p style={{ margin: 0, color: cssVar('text') }}>
-              订单 <code style={inlineCodeStyle}>{order.out_trade_no}</code> 已支付，金额{' '}
-              <strong style={{ color: cssVar('success') }}>¥{order.amount.toFixed(2)}</strong> 已入账。
-            </p>
-            <button style={{ ...primaryBtnStyle, marginTop: 20 }} onClick={handleReset}>再次充值</button>
-          </div>
-        </div>
+        <RechargeFrame>
+          <Panel title="充值成功">
+            <div className="ag-epay-user-card ag-epay-user-card--center">
+              <p className="ag-epay-result-message">
+                订单 <code className="ag-epay-code">{order.out_trade_no}</code> 已支付，金额{' '}
+                <span className="ag-epay-result-amount">¥{order.amount.toFixed(2)}</span> 已入账。
+              </p>
+              <div className="ag-epay-result-actions">
+                <Button variant="primary" onClick={handleReset}>再次充值</Button>
+              </div>
+            </div>
+          </Panel>
+        </RechargeFrame>
       );
     }
+
     if (order.status === 'pending') {
       return (
-        <div style={containerStyle}>
-          <h2 style={titleStyle}>扫码付款</h2>
-          <div style={qrPanelStyle}>
-            {qrDataUrl ? (
-              <img src={qrDataUrl} alt="付款二维码" style={qrImageStyle} />
-            ) : (
-              <div style={{ ...qrImageStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cssVar('textTertiary') }}>
-                生成二维码中...
+        <RechargeFrame>
+          <Panel title="扫码付款">
+            <div className="ag-epay-user-card">
+              <PaymentQrPanel
+                amountLabel={`¥ ${order.amount.toFixed(2)}`}
+                methodLabel={methodLabel(order.method)}
+                note="支付完成后本页将自动跳转到结果页（每 3 秒检查一次）"
+                orderNo={order.out_trade_no}
+                paymentUrl={order.payment_url}
+                qrDataUrl={qrDataUrl}
+              />
+              <div className="ag-epay-result-actions">
+                <Button onClick={handleReset}>取消</Button>
               </div>
-            )}
-            <div style={qrAmountStyle}>¥ {order.amount.toFixed(2)}</div>
-            <div style={{ color: cssVar('textSecondary'), fontSize: 13 }}>
-              请使用 {methodLabel(order.method)} 扫码完成付款
             </div>
-            <div style={{ marginTop: 8, color: cssVar('textTertiary'), fontSize: 12 }}>
-              订单号：<code style={inlineCodeStyle}>{order.out_trade_no}</code>
-            </div>
-            <p style={{ textAlign: 'center', color: cssVar('textTertiary'), fontSize: 13, marginTop: 20, marginBottom: 0 }}>
-              支付完成后本页将自动跳转到结果页（每 3 秒检查一次）
-            </p>
-            {order.payment_url && (
-              <p style={{ textAlign: 'center', fontSize: 12, marginTop: 8, marginBottom: 0 }}>
-                扫码不便？{' '}
-                <a href={order.payment_url} target="_blank" rel="noreferrer" style={{ color: cssVar('primary'), textDecoration: 'none' }}>
-                  点此在新窗口打开付款页 →
-                </a>
-              </p>
-            )}
-            <button style={{ ...secondaryBtnStyle, marginTop: 20 }} onClick={handleReset}>取消</button>
-          </div>
-        </div>
+          </Panel>
+        </RechargeFrame>
       );
     }
-    // expired / failed / cancelled
+
     return (
-      <div style={containerStyle}>
-        <h2 style={titleStyle}>订单已{statusLabel(order.status)}</h2>
-        <div style={panelStyle}>
-          <p style={{ margin: 0, color: cssVar('textSecondary') }}>
-            订单号：<code style={inlineCodeStyle}>{order.out_trade_no}</code>
-          </p>
-          <button style={{ ...primaryBtnStyle, marginTop: 20 }} onClick={handleReset}>重新发起</button>
-        </div>
-      </div>
+      <RechargeFrame>
+        <Panel title={`订单已${statusLabel(order.status)}`}>
+          <div className="ag-epay-user-card ag-epay-user-card--center">
+            <p className="ag-epay-result-message ag-epay-result-message--muted">
+              订单号：<code className="ag-epay-code">{order.out_trade_no}</code>
+            </p>
+            <div className="ag-epay-result-actions">
+              <Button variant="primary" onClick={handleReset}>重新发起</Button>
+            </div>
+          </div>
+        </Panel>
+      </RechargeFrame>
     );
   }
 
-  // 默认态：金额 + 渠道选择 + 提交
   return (
-    <div style={containerStyle}>
-      <h2 style={titleStyle}>账户充值</h2>
+    <RechargeFrame>
+      <Panel title="账户充值">
+        <div className="ag-epay-user-card">
+          <div className="ag-epay-recharge-form">
+            <section className="ag-epay-recharge-section">
+              <h3 className="ag-epay-section-title">选择金额</h3>
+              <div className="ag-epay-amount-grid">
+                {PRESET_AMOUNTS.map((value) => (
+                  <button
+                    key={value}
+                    aria-pressed={amount === value}
+                    className="ag-epay-choice-button"
+                    data-selected={amount === value ? 'true' : undefined}
+                    onClick={() => setAmount(value)}
+                    type="button"
+                  >
+                    ¥{value}
+                  </button>
+                ))}
+              </div>
 
-      <div style={panelStyle}>
-        <section>
-          <h3 style={sectionTitleStyle}>选择金额</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {[10, 30, 50, 100, 200, 500].map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setAmount(v)}
-                style={amount === v ? amountBtnActive : amountBtn}
-              >
-                ¥{v}
-              </button>
-            ))}
+              <FormField label="自定义金额">
+                <div className="ag-epay-amount-input-row">
+                  <input
+                    className="ag-epay-control ag-epay-input ag-epay-amount-input"
+                    max={10000}
+                    min={1}
+                    onChange={(event) => setAmount(Number(event.target.value))}
+                    step={1}
+                    type="number"
+                    value={amount}
+                  />
+                  <span className="ag-epay-field-unit">元</span>
+                </div>
+              </FormField>
+            </section>
+
+            <section className="ag-epay-recharge-section">
+              <h3 className="ag-epay-section-title">选择支付方式</h3>
+              <div className="ag-epay-method-grid">
+                {methods.map((item) => (
+                  <button
+                    key={item.key}
+                    aria-pressed={method === item.key}
+                    className="ag-epay-choice-button ag-epay-method-choice"
+                    data-selected={method === item.key ? 'true' : undefined}
+                    onClick={() => setMethod(item.key)}
+                    title={item.description}
+                    type="button"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {error ? <p className="ag-epay-form-error">{error}</p> : null}
+
+            <Button
+              className="ag-epay-submit-button"
+              disabled={submitting}
+              onClick={handleSubmit}
+              variant="primary"
+            >
+              {submitting ? '处理中...' : '立即支付'}
+            </Button>
           </div>
-          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8, color: cssVar('textSecondary'), fontSize: 13 }}>
-            <span>自定义金额</span>
-            <input
-              type="number"
-              min={1}
-              max={10000}
-              step={1}
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              style={inputStyle}
-            />
-            <span>元</span>
-          </div>
-        </section>
-
-        <section style={sectionStyle}>
-          <h3 style={sectionTitleStyle}>选择支付方式</h3>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            {methods.map((m) => (
-              <button
-                key={m.key}
-                type="button"
-                onClick={() => setMethod(m.key)}
-                style={method === m.key ? channelCardActive : channelCard}
-                title={m.description}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {error && <p style={{ color: cssVar('danger'), marginTop: 16, fontSize: 13 }}>{error}</p>}
-
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={submitting}
-          style={{ ...primaryBtnStyle, marginTop: 24, width: '100%', opacity: submitting ? 0.6 : 1 }}
-        >
-          {submitting ? '处理中...' : '立即支付'}
-        </button>
-      </div>
-    </div>
+        </div>
+      </Panel>
+    </RechargeFrame>
   );
 }
 
-function methodLabel(m: string): string {
-  switch (m) {
-    case 'alipay': return '支付宝';
-    case 'wxpay': return '微信支付';
-    default: return m;
-  }
+function RechargeFrame({ children }: { children: ReactNode }) {
+  return (
+    <PageShell>
+      <div className="ag-epay-page-body ag-epay-user-page-body ag-epay-recharge-page">
+        {children}
+      </div>
+    </PageShell>
+  );
 }
 
-function statusLabel(s: string): string {
-  switch (s) {
-    case 'expired': return '过期';
-    case 'failed': return '失败';
-    case 'cancelled': return '取消';
-    case 'refunded': return '退款';
-    default: return s;
-  }
+function methodLabel(method: string): string {
+  return ({ alipay: '支付宝', wxpay: '微信支付', qqpay: 'QQ 钱包' } as Record<string, string>)[method] || method;
 }
 
-// ========== 样式 ==========
-// 使用 SDK 的设计 token，对齐 openai 插件的视觉风格：
-//   - 卡片：bgSurface + glassBorder + radiusLg
-//   - 输入：bg 背景 + glassBorder + radiusMd
-//   - 文字：text / textSecondary / textTertiary 三级层次
+function statusLabel(status: string): string {
+  return ({
+    expired: '过期',
+    failed: '失败',
+    cancelled: '取消',
+    refunded: '退款',
+  } as Record<string, string>)[status] || status;
+}
 
-const containerStyle: React.CSSProperties = {
-  maxWidth: 720,
-  margin: '0 auto',
-  padding: '24px 24px 48px',
-  color: cssVar('text'),
-};
-
-const titleStyle: React.CSSProperties = {
-  margin: '0 0 20px',
-  fontSize: 22,
-  fontWeight: 600,
-  color: cssVar('text'),
-  letterSpacing: '-0.01em',
-};
-
-const hintStyle: React.CSSProperties = {
-  padding: '40px 0',
-  textAlign: 'center',
-  color: cssVar('textSecondary'),
-};
-
-const panelStyle: React.CSSProperties = {
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusLg'),
-  background: cssVar('bgSurface'),
-  padding: '24px',
-};
-
-const sectionStyle: React.CSSProperties = {
-  marginTop: 28,
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  margin: '0 0 12px',
-  fontSize: 13,
-  fontWeight: 600,
-  color: cssVar('textSecondary'),
-  textTransform: 'uppercase',
-  letterSpacing: '0.04em',
-};
-
-const amountBtn: React.CSSProperties = {
-  minWidth: 88,
-  padding: '12px 18px',
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusMd'),
-  background: cssVar('bg'),
-  color: cssVar('text'),
-  cursor: 'pointer',
-  fontSize: 15,
-  fontWeight: 500,
-  transition: cssVar('transition'),
-};
-
-const amountBtnActive: React.CSSProperties = {
-  ...amountBtn,
-  borderColor: cssVar('primary'),
-  background: cssVar('primarySubtle'),
-  color: cssVar('primary'),
-  fontWeight: 600,
-};
-
-const channelCard: React.CSSProperties = {
-  minWidth: 140,
-  padding: '16px 24px',
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusMd'),
-  background: cssVar('bgElevated'),
-  color: cssVar('text'),
-  cursor: 'pointer',
-  fontSize: 14,
-  fontWeight: 500,
-  transition: cssVar('transition'),
-};
-
-const channelCardActive: React.CSSProperties = {
-  ...channelCard,
-  borderColor: cssVar('primary'),
-  background: cssVar('primarySubtle'),
-  color: cssVar('primary'),
-  fontWeight: 600,
-};
-
-const inputStyle: React.CSSProperties = {
-  padding: '8px 12px',
-  width: 140,
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusMd'),
-  background: cssVar('bgElevated'),
-  color: cssVar('text'),
-  fontSize: 14,
-  outline: 'none',
-};
-
-const primaryBtnStyle: React.CSSProperties = {
-  padding: '12px 28px',
-  border: 'none',
-  borderRadius: cssVar('radiusMd'),
-  background: cssVar('primary'),
-  color: cssVar('textInverse'),
-  fontSize: 14,
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition: cssVar('transition'),
-};
-
-const secondaryBtnStyle: React.CSSProperties = {
-  padding: '10px 24px',
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusMd'),
-  background: cssVar('bgElevated'),
-  color: cssVar('text'),
-  fontSize: 13,
-  fontWeight: 500,
-  cursor: 'pointer',
-  transition: cssVar('transition'),
-};
-
-const qrPanelStyle: React.CSSProperties = {
-  padding: '28px 24px',
-  border: `1px solid ${cssVar('glassBorder')}`,
-  borderRadius: cssVar('radiusLg'),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  background: cssVar('bgSurface'),
-};
-
-const qrImageStyle: React.CSSProperties = {
-  width: 240,
-  height: 240,
-  background: cssVar('bgElevated'),
-  padding: 8,
-  borderRadius: cssVar('radiusMd'),
-};
-
-const qrAmountStyle: React.CSSProperties = {
-  marginTop: 20,
-  fontSize: 32,
-  fontWeight: 700,
-  color: cssVar('text'),
-  fontFamily: cssVar('fontMono'),
-  letterSpacing: '-0.02em',
-};
-
-const inlineCodeStyle: React.CSSProperties = {
-  fontFamily: cssVar('fontMono'),
-  fontSize: '0.9em',
-  padding: '1px 6px',
-  borderRadius: 4,
-  background: cssVar('bg'),
-  color: cssVar('textSecondary'),
-};
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
