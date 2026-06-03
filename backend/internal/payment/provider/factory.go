@@ -63,6 +63,7 @@ type KindMeta struct {
 	Kind             string            `json:"kind"`
 	Name             string            `json:"name"`
 	Description      string            `json:"description"`
+	TechnicalDetail  string            `json:"technical_detail,omitempty"`
 	SupportedMethods []string          `json:"supported_methods"`
 	FieldDescriptors []FieldDescriptor `json:"field_descriptors"`
 }

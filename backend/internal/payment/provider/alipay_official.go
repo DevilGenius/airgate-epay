@@ -32,7 +32,8 @@ func init() {
 	RegisterKindMeta(KindMeta{
 		Kind:             KindAlipayOfficial,
 		Name:             "支付宝官方",
-		Description:      "直连支付宝开放平台，资金直达商户账户，需企业资质 + RSA 公私钥",
+		Description:      "对接支付宝开放平台，适合企业商户直连收款；支持支付宝扫码支付。",
+		TechnicalDetail:  "RSA 公私钥签名，使用 TradePreCreate 生成二维码。",
 		SupportedMethods: []string{MethodAlipay},
 		FieldDescriptors: []FieldDescriptor{
 			{Key: "app_id", Label: "AppID", Type: "text", Required: true,

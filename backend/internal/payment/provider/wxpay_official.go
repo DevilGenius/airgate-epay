@@ -42,7 +42,8 @@ func init() {
 	RegisterKindMeta(KindMeta{
 		Kind:             KindWxpayOfficial,
 		Name:             "微信支付官方 V3",
-		Description:      "直连微信商户平台 APIv3，Native 扫码支付，需企业资质",
+		Description:      "对接微信商户平台，适合企业商户直连收款；支持微信支付。",
+		TechnicalDetail:  "APIv3 + RSA-SHA256 签名，Native 扫码支付。",
 		SupportedMethods: []string{MethodWxpay},
 		FieldDescriptors: []FieldDescriptor{
 			{Key: "mch_id", Label: "商户号", Type: "text", Required: true},

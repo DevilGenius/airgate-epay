@@ -139,6 +139,9 @@ export default function AdminProvidersPage() {
                     <div className="ag-epay-provider-meta">{kind.kind}</div>
                   </div>
                   <div className="ag-epay-kind-description">{kind.description}</div>
+                  {kind.technical_detail ? (
+                    <div className="ag-epay-kind-technical">{kind.technical_detail}</div>
+                  ) : null}
                   <MethodChips format={methodLabel} methods={kind.supported_methods} />
                   <Button variant="primary" onClick={() => handleAdd(kind)}>
                     <PlusIcon className="ag-epay-icon" />

@@ -28,7 +28,8 @@ func init() {
 	RegisterKindMeta(KindMeta{
 		Kind:             KindEpayCaihong,
 		Name:             "彩虹易支付（标准）",
-		Description:      "彩虹/码支付/各类 PHP 易支付平台，pid+key，GET submit.php 跳转",
+		Description:      "对接标准易支付平台，适合聚合通道和码支付；支持支付宝、微信支付。",
+		TechnicalDetail:  "pid+key 签名，GET submit.php 跳转。",
 		SupportedMethods: []string{MethodAlipay, MethodWxpay},
 		FieldDescriptors: []FieldDescriptor{
 			{Key: "pid", Label: "PID（商户 ID）", Type: "text", Required: true},

@@ -30,7 +30,8 @@ func init() {
 	RegisterKindMeta(KindMeta{
 		Kind:             KindEpayEasyPay,
 		Name:             "EasyPay（自建支付网关）",
-		Description:      "对接自部署的 easy-pay 支付网关，REST API + HMAC-SHA256 签名",
+		Description:      "对接自建 EasyPay 网关，适合私有化聚合收款；支持支付宝、微信支付。",
+		TechnicalDetail:  "REST API + HMAC-SHA256 签名。",
 		SupportedMethods: []string{MethodAlipay, MethodWxpay},
 		FieldDescriptors: []FieldDescriptor{
 			{Key: "app_id", Label: "App ID", Type: "text", Required: true,

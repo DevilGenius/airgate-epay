@@ -115,6 +115,7 @@ export interface ProviderKindMeta {
   kind: string;
   name: string;
   description: string;
+  technical_detail?: string;
   supported_methods: string[];
   field_descriptors: ProviderFieldDescriptor[];
 }

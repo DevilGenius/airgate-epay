@@ -29,7 +29,8 @@ func init() {
 	RegisterKindMeta(KindMeta{
 		Kind:        KindEpayXunhu,
 		Name:        "虎皮椒 V3",
-		Description: "虎皮椒及兼容平台（xunhupay/彩虹V3 二开等），POST do.html，appid+appsecret 签名",
+		Description:     "对接虎皮椒 V3 协议，适合虎皮椒及兼容平台；支持支付宝、微信支付。",
+		TechnicalDetail: "POST do.html，appid+appsecret 签名。",
 		// 协议层支持的所有方式；admin 在配置时通过 enabled_methods 字段勾选实际启用的子集
 		SupportedMethods: []string{MethodAlipay, MethodWxpay},
 		FieldDescriptors: []FieldDescriptor{
