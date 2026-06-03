@@ -10,7 +10,7 @@
 package main
 
 import (
-	sdkgrpc "github.com/DouDOU-start/airgate-sdk/runtimego/grpc"
+	sdkgrpc "github.com/DevilGenius/airgate-sdk/runtimego/grpc"
 
 	"github.com/DouDOU-start/airgate-epay/backend/internal/payment"
 )

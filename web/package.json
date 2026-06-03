@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@doudou-start/airgate-theme": "https://github.com/DouDOU-start/airgate-sdk/releases/download/v0.2.0/airgate-theme-v0.2.0.tgz",
+    "@devilgenius/airgate-theme": "https://github.com/DevilGenius/airgate-sdk/releases/download/v0.2.2/airgate-theme-v0.2.2.tgz",
     "@types/qrcode": "^1.5.6",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",

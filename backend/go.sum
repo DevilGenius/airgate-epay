@@ -1,5 +1,5 @@
-github.com/DouDOU-start/airgate-sdk v0.2.1 h1:MylrFMifIJy5mT1wSFdXcSvAXjIcB6itp4dw8pP4pes=
-github.com/DouDOU-start/airgate-sdk v0.2.1/go.mod h1:784vC4lIfCnUdOroWuvn55Dv/b9TucVMpFwuu40gc0Q=
+github.com/DevilGenius/airgate-sdk v0.2.2 h1:sw9YbbQGpYQwUfm7BmOpcArqSnasEeAqUNO/TEbE0+0=
+github.com/DevilGenius/airgate-sdk v0.2.2/go.mod h1:EnjPPVBiONFv0gcQqiBPqs86HRhcVKICdFaB03yJcI8=
 github.com/agiledragon/gomonkey v2.0.2+incompatible h1:eXKi9/piiC3cjJD1658mEE2o3NjkJ5vDLgYjCQu0Xlw=
 github.com/agiledragon/gomonkey v2.0.2+incompatible/go.mod h1:2NGfXu1a80LLr2cmWXGBDaHEjb1idR6+FVlX5T3D9hw=
 github.com/bufbuild/protocompile v0.14.1 h1:iA73zAf/fyljNjQKwYzUHD6AD4R8KMasmwa/FBatYVw=

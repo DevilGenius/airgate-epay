@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  GOPRIVATE: github.com/DouDOU-start/airgate-sdk
+  GOPRIVATE: github.com/DevilGenius/airgate-sdk
 
 jobs:
   build:

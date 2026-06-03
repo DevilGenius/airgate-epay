@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { cssVar } from '@doudou-start/airgate-theme';
+import { cssVar } from '@devilgenius/airgate-theme';
 
 /**
  * 插件本地的 toast 实现，视觉风格对齐 core 的 ToastProvider：

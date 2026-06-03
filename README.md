@@ -4,9 +4,9 @@
   <p><strong>多渠道支付与余额充值插件</strong></p>
 
   <p>
-    <a href="https://github.com/DouDOU-start/airgate-epay/releases"><img src="https://img.shields.io/github/v/release/DouDOU-start/airgate-epay?style=flat-square" alt="release" /></a>
-    <a href="https://github.com/DouDOU-start/airgate-epay/blob/master/LICENSE"><img src="https://img.shields.io/github/license/DouDOU-start/airgate-epay?style=flat-square" alt="license" /></a>
-    <a href="https://github.com/DouDOU-start/airgate-epay/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/DouDOU-start/airgate-epay/ci.yml?branch=master&style=flat-square&label=CI" alt="ci" /></a>
+    <a href="https://github.com/DevilGenius/airgate-epay/releases"><img src="https://img.shields.io/github/v/release/DevilGenius/airgate-epay?style=flat-square" alt="release" /></a>
+    <a href="https://github.com/DevilGenius/airgate-epay/blob/master/LICENSE"><img src="https://img.shields.io/github/license/DevilGenius/airgate-epay?style=flat-square" alt="license" /></a>
+    <a href="https://github.com/DevilGenius/airgate-epay/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/DevilGenius/airgate-epay/ci.yml?branch=master&style=flat-square&label=CI" alt="ci" /></a>
     <img src="https://img.shields.io/badge/Go-1.25-00ADD8?style=flat-square&logo=go" alt="go" />
     <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react" alt="react" />
   </p>
@@ -14,7 +14,7 @@
 
 ---
 
-AirGate ePay 是 [airgate-core](https://github.com/DouDOU-start/airgate-core) 的支付扩展插件。它在一个 gRPC 子进程里同时承载**虎皮椒、彩虹易支付、支付宝官方、微信支付官方**四类支付服务商，把"用户充值 → 跳转支付 → 异步通知 → 加余额"的全流程封装成一个可热装载的插件。
+AirGate ePay 是 [airgate-core](https://github.com/DevilGenius/airgate-core) 的支付扩展插件。它在一个 gRPC 子进程里同时承载**虎皮椒、彩虹易支付、支付宝官方、微信支付官方**四类支付服务商，把"用户充值 → 跳转支付 → 异步通知 → 加余额"的全流程封装成一个可热装载的插件。
 
 它解决一个具体问题：**网关想给用户开放余额充值，又不想把支付逻辑硬塞进 core**。ePay 把订单表、回调入口、加余额事务、对账任务全部装进自己的进程，core 只感知到一个标准插件。
 
@@ -172,12 +172,12 @@ airgate-epay/
 ```text
 1. 插件市场 → 点击「安装」    （从 GitHub Release 自动拉取，匹配当前架构）
 2. 上传安装 → 拖入二进制文件   （适合内部环境）
-3. GitHub 安装 → 输入 DouDOU-start/airgate-epay
+3. GitHub 安装 → 输入 DevilGenius/airgate-epay
 ```
 
 ### 本地开发
 
-需要 Go 1.25+、Node 22+、本地 PostgreSQL，以及兄弟目录 [`airgate-sdk`](https://github.com/DouDOU-start/airgate-sdk) 与 [`airgate-core`](https://github.com/DouDOU-start/airgate-core)：
+需要 Go 1.25+、Node 22+、本地 PostgreSQL，以及兄弟目录 [`airgate-sdk`](https://github.com/DevilGenius/airgate-sdk) 与 [`airgate-core`](https://github.com/DevilGenius/airgate-core)：
 
 ```bash
 make install        # 装 web 依赖与 Go 模块
@@ -218,9 +218,9 @@ git tag = release 版本 = 已安装 tab 显示的版本，**单一来源、永�
 
 ## 🤝 反馈
 
-- Bug / Feature: [Issues](https://github.com/DouDOU-start/airgate-epay/issues)
-- 主仓库: [airgate-core](https://github.com/DouDOU-start/airgate-core)
-- 插件 SDK: [airgate-sdk](https://github.com/DouDOU-start/airgate-sdk)
+- Bug / Feature: [Issues](https://github.com/DevilGenius/airgate-epay/issues)
+- 主仓库: [airgate-core](https://github.com/DevilGenius/airgate-core)
+- 插件 SDK: [airgate-sdk](https://github.com/DevilGenius/airgate-sdk)
 
 ## 📜 License
 
