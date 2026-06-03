@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"strings"
 	"sync"
@@ -162,7 +163,7 @@ func (p *wxpayOfficialProvider) CreateOrder(ctx context.Context, in CreateOrderI
 	}
 
 	svc := native.NativeApiService{Client: p.apiClient}
-	totalCents := int64(in.Amount * 100) // 微信单位是分
+	totalCents := int64(math.Round(in.Amount * 100)) // 微信单位是分
 	currency := "CNY"
 
 	resp, _, err := svc.Prepay(ctx, native.PrepayRequest{

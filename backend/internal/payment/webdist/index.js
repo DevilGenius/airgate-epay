@@ -298,7 +298,7 @@ function tn() {
   })(Se)), Se;
 }
 var re = {}, nt;
-function Bt() {
+function _t() {
   if (nt) return re;
   nt = 1;
   const e = Oe(), r = [
@@ -703,9 +703,9 @@ function an() {
     };
   })(Pe)), Pe;
 }
-var Be, it;
+var _e, it;
 function rn() {
-  if (it) return Be;
+  if (it) return _e;
   it = 1;
   const e = an();
   function r(o) {
@@ -724,16 +724,16 @@ function rn() {
       return l.set(i, s), l;
     }
     return i;
-  }, Be = r, Be;
+  }, _e = r, _e;
 }
-var Te = {}, _e = {}, Me = {}, ot;
-function Tt() {
+var Be = {}, Te = {}, Me = {}, ot;
+function Bt() {
   return ot || (ot = 1, Me.isValid = function(r) {
     return !isNaN(r) && r >= 1 && r <= 40;
   }), Me;
 }
 var x = {}, st;
-function _t() {
+function Tt() {
   if (st) return x;
   st = 1;
   const e = "[0-9]+", r = "[A-Z $%*+\\-./:]+";
@@ -754,7 +754,7 @@ function _t() {
 var lt;
 function J() {
   return lt || (lt = 1, (function(e) {
-    const r = Tt(), o = _t();
+    const r = Bt(), o = Tt();
     e.NUMERIC = {
       id: "Numeric",
       bit: 1,
@@ -811,12 +811,12 @@ function J() {
         return s;
       }
     };
-  })(_e)), _e;
+  })(Te)), Te;
 }
 var ct;
 function on() {
   return ct || (ct = 1, (function(e) {
-    const r = G(), o = Bt(), t = Oe(), n = J(), i = Tt(), s = 7973, l = r.getBCHDigit(s);
+    const r = G(), o = _t(), t = Oe(), n = J(), i = Bt(), s = 7973, l = r.getBCHDigit(s);
     function c(g, f, u) {
       for (let N = 1; N <= 40; N++)
         if (f <= e.getCapacity(N, u, g))
@@ -845,17 +845,17 @@ function on() {
       typeof N > "u" && (N = n.BYTE);
       const A = r.getSymbolTotalCodewords(f), p = o.getTotalCodewordsCount(f, u), C = (A - p) * 8;
       if (N === n.MIXED) return C;
-      const T = C - d(N, f);
+      const B = C - d(N, f);
       switch (N) {
         case n.NUMERIC:
-          return Math.floor(T / 10 * 3);
+          return Math.floor(B / 10 * 3);
         case n.ALPHANUMERIC:
-          return Math.floor(T / 11 * 2);
+          return Math.floor(B / 11 * 2);
         case n.KANJI:
-          return Math.floor(T / 13);
+          return Math.floor(B / 13);
         case n.BYTE:
         default:
-          return Math.floor(T / 8);
+          return Math.floor(B / 8);
       }
     }, e.getBestVersionForData = function(f, u) {
       let N;
@@ -877,7 +877,7 @@ function on() {
         u ^= s << r.getBCHDigit(u) - l;
       return f << 12 | u;
     };
-  })(Te)), Te;
+  })(Be)), Be;
 }
 var Ie = {}, dt;
 function sn() {
@@ -1104,14 +1104,14 @@ function hn() {
 var mt;
 function gn() {
   return mt || (mt = 1, (function(e) {
-    const r = J(), o = ln(), t = cn(), n = dn(), i = un(), s = _t(), l = G(), c = hn();
+    const r = J(), o = ln(), t = cn(), n = dn(), i = un(), s = Tt(), l = G(), c = hn();
     function d(p) {
       return unescape(encodeURIComponent(p)).length;
     }
-    function h(p, C, T) {
+    function h(p, C, B) {
       const k = [];
       let E;
-      for (; (E = p.exec(T)) !== null; )
+      for (; (E = p.exec(B)) !== null; )
         k.push({
           data: E[0],
           index: E.index,
@@ -1121,9 +1121,9 @@ function gn() {
       return k;
     }
     function m(p) {
-      const C = h(s.NUMERIC, r.NUMERIC, p), T = h(s.ALPHANUMERIC, r.ALPHANUMERIC, p);
+      const C = h(s.NUMERIC, r.NUMERIC, p), B = h(s.ALPHANUMERIC, r.ALPHANUMERIC, p);
       let k, E;
-      return l.isKanjiModeEnabled() ? (k = h(s.BYTE, r.BYTE, p), E = h(s.KANJI, r.KANJI, p)) : (k = h(s.BYTE_KANJI, r.BYTE, p), E = []), C.concat(T, k, E).sort(function(b, S) {
+      return l.isKanjiModeEnabled() ? (k = h(s.BYTE, r.BYTE, p), E = h(s.KANJI, r.KANJI, p)) : (k = h(s.BYTE_KANJI, r.BYTE, p), E = []), C.concat(B, k, E).sort(function(b, S) {
         return b.index - S.index;
       }).map(function(b) {
         return {
@@ -1146,15 +1146,15 @@ function gn() {
       }
     }
     function f(p) {
-      return p.reduce(function(C, T) {
+      return p.reduce(function(C, B) {
         const k = C.length - 1 >= 0 ? C[C.length - 1] : null;
-        return k && k.mode === T.mode ? (C[C.length - 1].data += T.data, C) : (C.push(T), C);
+        return k && k.mode === B.mode ? (C[C.length - 1].data += B.data, C) : (C.push(B), C);
       }, []);
     }
     function u(p) {
       const C = [];
-      for (let T = 0; T < p.length; T++) {
-        const k = p[T];
+      for (let B = 0; B < p.length; B++) {
+        const k = p[B];
         switch (k.mode) {
           case r.NUMERIC:
             C.push([
@@ -1184,31 +1184,31 @@ function gn() {
       return C;
     }
     function N(p, C) {
-      const T = {}, k = { start: {} };
+      const B = {}, k = { start: {} };
       let E = ["start"];
       for (let w = 0; w < p.length; w++) {
         const b = p[w], S = [];
         for (let v = 0; v < b.length; v++) {
           const M = b[v], P = "" + w + v;
-          S.push(P), T[P] = { node: M, lastCount: 0 }, k[P] = {};
-          for (let _ = 0; _ < E.length; _++) {
-            const B = E[_];
-            T[B] && T[B].node.mode === M.mode ? (k[B][P] = g(T[B].lastCount + M.length, M.mode) - g(T[B].lastCount, M.mode), T[B].lastCount += M.length) : (T[B] && (T[B].lastCount = M.length), k[B][P] = g(M.length, M.mode) + 4 + r.getCharCountIndicator(M.mode, C));
+          S.push(P), B[P] = { node: M, lastCount: 0 }, k[P] = {};
+          for (let T = 0; T < E.length; T++) {
+            const _ = E[T];
+            B[_] && B[_].node.mode === M.mode ? (k[_][P] = g(B[_].lastCount + M.length, M.mode) - g(B[_].lastCount, M.mode), B[_].lastCount += M.length) : (B[_] && (B[_].lastCount = M.length), k[_][P] = g(M.length, M.mode) + 4 + r.getCharCountIndicator(M.mode, C));
           }
         }
         E = S;
       }
       for (let w = 0; w < E.length; w++)
         k[E[w]].end = 0;
-      return { map: k, table: T };
+      return { map: k, table: B };
     }
     function A(p, C) {
-      let T;
+      let B;
       const k = r.getBestModeForData(p);
-      if (T = r.from(C, k), T !== r.BYTE && T.bit < k.bit)
-        throw new Error('"' + p + '" cannot be encoded with mode ' + r.toString(T) + `.
+      if (B = r.from(C, k), B !== r.BYTE && B.bit < k.bit)
+        throw new Error('"' + p + '" cannot be encoded with mode ' + r.toString(B) + `.
  Suggested mode is: ` + r.toString(k));
-      switch (T === r.KANJI && !l.isKanjiModeEnabled() && (T = r.BYTE), T) {
+      switch (B === r.KANJI && !l.isKanjiModeEnabled() && (B = r.BYTE), B) {
         case r.NUMERIC:
           return new o(p);
         case r.ALPHANUMERIC:
@@ -1220,11 +1220,11 @@ function gn() {
       }
     }
     e.fromArray = function(C) {
-      return C.reduce(function(T, k) {
-        return typeof k == "string" ? T.push(A(k, null)) : k.data && T.push(A(k.data, k.mode)), T;
+      return C.reduce(function(B, k) {
+        return typeof k == "string" ? B.push(A(k, null)) : k.data && B.push(A(k.data, k.mode)), B;
       }, []);
-    }, e.fromString = function(C, T) {
-      const k = m(C, l.isKanjiModeEnabled()), E = u(k), w = N(E, T), b = c.find_path(w.map, "start", "end"), S = [];
+    }, e.fromString = function(C, B) {
+      const k = m(C, l.isKanjiModeEnabled()), E = u(k), w = N(E, B), b = c.find_path(w.map, "start", "end"), S = [];
       for (let v = 1; v < b.length - 1; v++)
         S.push(w.table[b[v]].node);
       return e.fromArray(f(S));
@@ -1239,15 +1239,15 @@ var yt;
 function fn() {
   if (yt) return we;
   yt = 1;
-  const e = G(), r = Oe(), o = Wt(), t = Zt(), n = Xt(), i = en(), s = tn(), l = Bt(), c = rn(), d = on(), h = sn(), m = J(), g = gn();
+  const e = G(), r = Oe(), o = Wt(), t = Zt(), n = Xt(), i = en(), s = tn(), l = _t(), c = rn(), d = on(), h = sn(), m = J(), g = gn();
   function f(w, b) {
     const S = w.size, v = i.getPositions(b);
     for (let M = 0; M < v.length; M++) {
-      const P = v[M][0], _ = v[M][1];
-      for (let B = -1; B <= 7; B++)
-        if (!(P + B <= -1 || S <= P + B))
+      const P = v[M][0], T = v[M][1];
+      for (let _ = -1; _ <= 7; _++)
+        if (!(P + _ <= -1 || S <= P + _))
           for (let I = -1; I <= 7; I++)
-            _ + I <= -1 || S <= _ + I || (B >= 0 && B <= 6 && (I === 0 || I === 6) || I >= 0 && I <= 6 && (B === 0 || B === 6) || B >= 2 && B <= 4 && I >= 2 && I <= 4 ? w.set(P + B, _ + I, !0, !0) : w.set(P + B, _ + I, !1, !0));
+            T + I <= -1 || S <= T + I || (_ >= 0 && _ <= 6 && (I === 0 || I === 6) || I >= 0 && I <= 6 && (_ === 0 || _ === 6) || _ >= 2 && _ <= 4 && I >= 2 && I <= 4 ? w.set(P + _, T + I, !0, !0) : w.set(P + _, T + I, !1, !0));
     }
   }
   function u(w) {
@@ -1261,33 +1261,33 @@ function fn() {
     const S = n.getPositions(b);
     for (let v = 0; v < S.length; v++) {
       const M = S[v][0], P = S[v][1];
-      for (let _ = -2; _ <= 2; _++)
-        for (let B = -2; B <= 2; B++)
-          _ === -2 || _ === 2 || B === -2 || B === 2 || _ === 0 && B === 0 ? w.set(M + _, P + B, !0, !0) : w.set(M + _, P + B, !1, !0);
+      for (let T = -2; T <= 2; T++)
+        for (let _ = -2; _ <= 2; _++)
+          T === -2 || T === 2 || _ === -2 || _ === 2 || T === 0 && _ === 0 ? w.set(M + T, P + _, !0, !0) : w.set(M + T, P + _, !1, !0);
     }
   }
   function A(w, b) {
     const S = w.size, v = d.getEncodedBits(b);
-    let M, P, _;
-    for (let B = 0; B < 18; B++)
-      M = Math.floor(B / 3), P = B % 3 + S - 8 - 3, _ = (v >> B & 1) === 1, w.set(M, P, _, !0), w.set(P, M, _, !0);
+    let M, P, T;
+    for (let _ = 0; _ < 18; _++)
+      M = Math.floor(_ / 3), P = _ % 3 + S - 8 - 3, T = (v >> _ & 1) === 1, w.set(M, P, T, !0), w.set(P, M, T, !0);
   }
   function p(w, b, S) {
     const v = w.size, M = h.getEncodedBits(b, S);
-    let P, _;
+    let P, T;
     for (P = 0; P < 15; P++)
-      _ = (M >> P & 1) === 1, P < 6 ? w.set(P, 8, _, !0) : P < 8 ? w.set(P + 1, 8, _, !0) : w.set(v - 15 + P, 8, _, !0), P < 8 ? w.set(8, v - P - 1, _, !0) : P < 9 ? w.set(8, 15 - P - 1 + 1, _, !0) : w.set(8, 15 - P - 1, _, !0);
+      T = (M >> P & 1) === 1, P < 6 ? w.set(P, 8, T, !0) : P < 8 ? w.set(P + 1, 8, T, !0) : w.set(v - 15 + P, 8, T, !0), P < 8 ? w.set(8, v - P - 1, T, !0) : P < 9 ? w.set(8, 15 - P - 1 + 1, T, !0) : w.set(8, 15 - P - 1, T, !0);
     w.set(v - 8, 8, 1, !0);
   }
   function C(w, b) {
     const S = w.size;
-    let v = -1, M = S - 1, P = 7, _ = 0;
-    for (let B = S - 1; B > 0; B -= 2)
-      for (B === 6 && B--; ; ) {
+    let v = -1, M = S - 1, P = 7, T = 0;
+    for (let _ = S - 1; _ > 0; _ -= 2)
+      for (_ === 6 && _--; ; ) {
         for (let I = 0; I < 2; I++)
-          if (!w.isReserved(M, B - I)) {
+          if (!w.isReserved(M, _ - I)) {
             let O = !1;
-            _ < b.length && (O = (b[_] >>> P & 1) === 1), w.set(M, B - I, O), P--, P === -1 && (_++, P = 7);
+            T < b.length && (O = (b[T] >>> P & 1) === 1), w.set(M, _ - I, O), P--, P === -1 && (T++, P = 7);
           }
         if (M += v, M < 0 || S <= M) {
           M -= v, v = -v;
@@ -1295,36 +1295,36 @@ function fn() {
         }
       }
   }
-  function T(w, b, S) {
+  function B(w, b, S) {
     const v = new o();
     S.forEach(function(I) {
       v.put(I.mode.bit, 4), v.put(I.getLength(), m.getCharCountIndicator(I.mode, w)), I.write(v);
     });
-    const M = e.getSymbolTotalCodewords(w), P = l.getTotalCodewordsCount(w, b), _ = (M - P) * 8;
-    for (v.getLengthInBits() + 4 <= _ && v.put(0, 4); v.getLengthInBits() % 8 !== 0; )
+    const M = e.getSymbolTotalCodewords(w), P = l.getTotalCodewordsCount(w, b), T = (M - P) * 8;
+    for (v.getLengthInBits() + 4 <= T && v.put(0, 4); v.getLengthInBits() % 8 !== 0; )
       v.putBit(0);
-    const B = (_ - v.getLengthInBits()) / 8;
-    for (let I = 0; I < B; I++)
+    const _ = (T - v.getLengthInBits()) / 8;
+    for (let I = 0; I < _; I++)
       v.put(I % 2 ? 17 : 236, 8);
     return k(v, w, b);
   }
   function k(w, b, S) {
-    const v = e.getSymbolTotalCodewords(b), M = l.getTotalCodewordsCount(b, S), P = v - M, _ = l.getBlocksCount(b, S), B = v % _, I = _ - B, O = Math.floor(v / _), ee = Math.floor(P / _), Ht = ee + 1, He = O - ee, Kt = new c(He);
+    const v = e.getSymbolTotalCodewords(b), M = l.getTotalCodewordsCount(b, S), P = v - M, T = l.getBlocksCount(b, S), _ = v % T, I = T - _, O = Math.floor(v / T), ee = Math.floor(P / T), Ht = ee + 1, He = O - ee, Kt = new c(He);
     let fe = 0;
-    const ae = new Array(_), Ke = new Array(_);
+    const ae = new Array(T), Ke = new Array(T);
     let pe = 0;
     const Gt = new Uint8Array(w.buffer);
-    for (let Y = 0; Y < _; Y++) {
+    for (let Y = 0; Y < T; Y++) {
       const ye = Y < I ? ee : Ht;
       ae[Y] = Gt.slice(fe, fe + ye), Ke[Y] = Kt.encode(ae[Y]), fe += ye, pe = Math.max(pe, ye);
     }
     const me = new Uint8Array(v);
     let Ge = 0, U, z;
     for (U = 0; U < pe; U++)
-      for (z = 0; z < _; z++)
+      for (z = 0; z < T; z++)
         U < ae[z].length && (me[Ge++] = ae[z][U]);
     for (U = 0; U < He; U++)
-      for (z = 0; z < _; z++)
+      for (z = 0; z < T; z++)
         me[Ge++] = Ke[z][U];
     return me;
   }
@@ -1353,8 +1353,8 @@ The chosen QR Code version cannot contain this amount of data.
 Minimum version required to store current data is: ` + P + `.
 `
       );
-    const _ = T(b, S, M), B = e.getSymbolSize(b), I = new t(B);
-    return f(I, b), u(I), N(I, b), p(I, S, 0), b >= 7 && A(I, b), C(I, _), isNaN(v) && (v = s.getBestMask(
+    const T = B(b, S, M), _ = e.getSymbolSize(b), I = new t(_);
+    return f(I, b), u(I), N(I, b), p(I, S, 0), b >= 7 && A(I, b), C(I, T), isNaN(v) && (v = s.getBestMask(
       I,
       p.bind(null, I, S)
     )), s.applyMask(v, I), p(I, S, v), {
@@ -1518,10 +1518,17 @@ function yn() {
 }
 var bn = yn();
 const It = /* @__PURE__ */ Yt(bn), wn = "/api/v1/ext-user/payment-epay", Nn = "/api/v1/ext/payment-epay";
+function vn() {
+  try {
+    return sessionStorage.getItem("token") || "";
+  } catch {
+    return "";
+  }
+}
 async function $(e, r, o, t) {
   const n = {};
   o !== void 0 && (n["Content-Type"] = "application/json");
-  const i = localStorage.getItem("token");
+  const i = vn();
   i && (n.Authorization = `Bearer ${i}`);
   const s = t != null && t.admin ? Nn : wn, l = await fetch(s + r, {
     method: e,
@@ -1535,7 +1542,7 @@ async function $(e, r, o, t) {
   }
   if (!l.ok) {
     const m = d, g = (m == null ? void 0 : m.message) || (d == null ? void 0 : d.error) || `HTTP ${l.status}`;
-    throw l.status === 401 && (localStorage.removeItem("token"), window.location.href = "/login"), new Error(g);
+    throw new Error(g);
   }
   const h = d;
   if (h && typeof h == "object" && "code" in h && "data" in h) {
@@ -1663,7 +1670,7 @@ function Rt({
         type: "button",
         children: [
           /* @__PURE__ */ a("span", { className: "ag-epay-select-value", children: (g == null ? void 0 : g.label) ?? "" }),
-          /* @__PURE__ */ a(En, { className: "ag-epay-select-caret" })
+          /* @__PURE__ */ a(Sn, { className: "ag-epay-select-caret" })
         ]
       }
     ),
@@ -1686,7 +1693,7 @@ function Rt({
     }) }) : null
   ] });
 }
-function vn({
+function Cn({
   page: e,
   pageSize: r,
   pageSizeOptions: o,
@@ -1735,7 +1742,7 @@ function vn({
           onClick: () => i(d),
           type: "button",
           children: [
-            /* @__PURE__ */ a(Sn, { className: "ag-epay-icon" }),
+            /* @__PURE__ */ a(Pn, { className: "ag-epay-icon" }),
             /* @__PURE__ */ a("span", { children: "上一页" })
           ]
         }
@@ -1761,7 +1768,7 @@ function vn({
           type: "button",
           children: [
             /* @__PURE__ */ a("span", { children: "下一页" }),
-            /* @__PURE__ */ a(Pn, { className: "ag-epay-icon" })
+            /* @__PURE__ */ a(_n, { className: "ag-epay-icon" })
           ]
         }
       )
@@ -1867,7 +1874,7 @@ function Lt({
     /* @__PURE__ */ a("span", { children: r })
   ] });
 }
-function Cn({
+function kn({
   candidates: e,
   format: r,
   onChange: o,
@@ -1896,19 +1903,19 @@ function qt({ className: e }) {
     /* @__PURE__ */ a("path", { d: "M8 16H3v5" })
   ] });
 }
-function kn({ className: e }) {
+function En({ className: e }) {
   return /* @__PURE__ */ y("svg", { className: e, fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", viewBox: "0 0 24 24", children: [
     /* @__PURE__ */ a("path", { d: "M5 12h14" }),
     /* @__PURE__ */ a("path", { d: "M12 5v14" })
   ] });
 }
-function En({ className: e }) {
+function Sn({ className: e }) {
   return /* @__PURE__ */ a("svg", { className: e, fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", viewBox: "0 0 24 24", children: /* @__PURE__ */ a("path", { d: "m6 9 6 6 6-6" }) });
 }
-function Sn({ className: e }) {
+function Pn({ className: e }) {
   return /* @__PURE__ */ a("svg", { className: e, fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", viewBox: "0 0 24 24", children: /* @__PURE__ */ a("path", { d: "m15 18-6-6 6-6" }) });
 }
-function Pn({ className: e }) {
+function _n({ className: e }) {
   return /* @__PURE__ */ a("svg", { className: e, fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", viewBox: "0 0 24 24", children: /* @__PURE__ */ a("path", { d: "m9 18 6-6-6-6" }) });
 }
 function Bn(e, r) {
@@ -1920,7 +1927,7 @@ function Bn(e, r) {
   return e < r - 2 && o.push("..."), o.push(r), o;
 }
 const Tn = [10, 30, 50, 100, 200, 500];
-function _n() {
+function Mn() {
   const [e, r] = R([]), [o, t] = R(!0), [n, i] = R(null), [s, l] = R(30), [c, d] = R(""), [h, m] = R(!1), [g, f] = R(null), [u, N] = R(null), [A, p] = R(null), C = de(null);
   D(() => {
     F.methods().then((E) => {
@@ -1961,7 +1968,7 @@ function _n() {
       w = !0;
     };
   }, [u == null ? void 0 : u.payment_url, u == null ? void 0 : u.qr_code_content]);
-  const T = async () => {
+  const B = async () => {
     if (f(null), !c) {
       f("请选择支付方式");
       return;
@@ -2003,7 +2010,7 @@ function _n() {
       At,
       {
         amountLabel: `¥ ${u.amount.toFixed(2)}`,
-        methodLabel: Mn(u.method),
+        methodLabel: In(u.method),
         note: "支付完成后本页将自动跳转到结果页（每 3 秒检查一次）",
         orderNo: u.out_trade_no,
         paymentUrl: u.payment_url,
@@ -2011,7 +2018,7 @@ function _n() {
       }
     ),
     /* @__PURE__ */ a("div", { className: "ag-epay-result-actions", children: /* @__PURE__ */ a(L, { onClick: k, children: "取消" }) })
-  ] }) }) }) : /* @__PURE__ */ a(K, { children: /* @__PURE__ */ a(j, { title: `订单已${In(u.status)}`, children: /* @__PURE__ */ y("div", { className: "ag-epay-user-card ag-epay-user-card--center", children: [
+  ] }) }) }) : /* @__PURE__ */ a(K, { children: /* @__PURE__ */ a(j, { title: `订单已${Rn(u.status)}`, children: /* @__PURE__ */ y("div", { className: "ag-epay-user-card ag-epay-user-card--center", children: [
     /* @__PURE__ */ y("p", { className: "ag-epay-result-message ag-epay-result-message--muted", children: [
       "订单号：",
       /* @__PURE__ */ a("code", { className: "ag-epay-code", children: u.out_trade_no })
@@ -2073,7 +2080,7 @@ function _n() {
       {
         className: "ag-epay-submit-button",
         disabled: h,
-        onClick: T,
+        onClick: B,
         variant: "primary",
         children: h ? "处理中..." : "立即支付"
       }
@@ -2083,10 +2090,10 @@ function _n() {
 function K({ children: e }) {
   return /* @__PURE__ */ a(ue, { children: /* @__PURE__ */ a("div", { className: "ag-epay-page-body ag-epay-user-page-body ag-epay-recharge-page", children: e }) });
 }
-function Mn(e) {
+function In(e) {
   return { alipay: "支付宝", wxpay: "微信支付", qqpay: "QQ 钱包" }[e] || e;
 }
-function In(e) {
+function Rn(e) {
   return {
     expired: "过期",
     failed: "失败",
@@ -2097,9 +2104,9 @@ function In(e) {
 function Ct(e) {
   return e instanceof Error ? e.message : String(e);
 }
-function Rn() {
+function An() {
   const [e, r] = R([]), [o, t] = R(!0), [n, i] = R(null), [s, l] = R(null), [c, d] = R(null), h = de(null), m = () => {
-    t(!0), F.listOrders(100).then((u) => r(u.list || [])).catch((u) => i(Dn(u))).finally(() => t(!1));
+    t(!0), F.listOrders(100).then((u) => r(u.list || [])).catch((u) => i(xn(u))).finally(() => t(!1));
   };
   return D(m, []), D(() => {
     if (!s) {
@@ -2135,7 +2142,7 @@ function Rn() {
     };
   }, [s == null ? void 0 : s.out_trade_no, s == null ? void 0 : s.status]), /* @__PURE__ */ a(ue, { children: /* @__PURE__ */ y("div", { className: "ag-epay-page-body ag-epay-user-page-body", children: [
     s ? /* @__PURE__ */ a(
-      An,
+      Ln,
       {
         onClose: () => {
           l(null), d(null);
@@ -2154,7 +2161,7 @@ function Rn() {
         /* @__PURE__ */ a("th", { "data-slot": "th", scope: "col", children: "支付时间" }),
         /* @__PURE__ */ a("th", { "data-slot": "th", scope: "col", children: "操作" })
       ] }) }),
-      /* @__PURE__ */ a("tbody", { "data-slot": "tbody", children: Ln({
+      /* @__PURE__ */ a("tbody", { "data-slot": "tbody", children: qn({
         err: n,
         loading: o,
         onContinuePay: (u) => {
@@ -2165,7 +2172,7 @@ function Rn() {
     ] }) }) }) })
   ] }) });
 }
-function An({
+function Ln({
   onClose: e,
   order: r,
   qrDataUrl: o
@@ -2215,7 +2222,7 @@ function An({
     }
   );
 }
-function Ln({
+function qn({
   err: e,
   loading: r,
   onContinuePay: o,
@@ -2233,7 +2240,7 @@ function Ln({
         n.amount.toFixed(2)
       ] }) }),
       /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(he, { format: Dt, methods: [n.method].filter(Boolean) }) }),
-      /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(le, { tone: qn(n.status), children: xt(n.status) }) }),
+      /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(le, { tone: Dn(n.status), children: xt(n.status) }) }),
       /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a("span", { className: "ag-epay-code", children: kt(n.created_at) }) }),
       /* @__PURE__ */ a("td", { "data-slot": "td", children: n.paid_at ? /* @__PURE__ */ a("span", { className: "ag-epay-code", children: kt(n.paid_at) }) : /* @__PURE__ */ a("span", { className: "ag-epay-text-muted", children: "-" }) }),
       /* @__PURE__ */ a("td", { "data-slot": "td", children: i ? /* @__PURE__ */ a(L, { onClick: () => o(n), children: "继续支付" }) : /* @__PURE__ */ a("span", { className: "ag-epay-text-muted", children: "-" }) })
@@ -2253,7 +2260,7 @@ function xt(e) {
     refunded: "已退款"
   }[e] || e;
 }
-function qn(e) {
+function Dn(e) {
   return {
     pending: "warning",
     paid: "success",
@@ -2276,7 +2283,7 @@ function kt(e) {
     return e;
   }
 }
-function Dn(e) {
+function xn(e) {
   return e instanceof Error ? e.message : String(e);
 }
 const Et = {
@@ -2289,7 +2296,7 @@ const Et = {
   refunded: 0,
   total_amount_paid: 0,
   today_amount_paid: 0
-}, X = [20, 50, 100], Ft = "payment-epay.admin-orders.page-size", xn = [
+}, X = [20, 50, 100], Ft = "payment-epay.admin-orders.page-size", Fn = [
   { value: "all", label: "全部状态" },
   { value: "pending", label: "待支付" },
   { value: "paid", label: "已支付" },
@@ -2298,22 +2305,22 @@ const Et = {
   { value: "cancelled", label: "已取消" },
   { value: "refunded", label: "已退款" }
 ];
-function Fn() {
-  const [e, r] = R([]), [o, t] = R(0), [n, i] = R(Et), [s, l] = R(!0), [c, d] = R(null), [h, m] = R("all"), [g, f] = R(""), [u, N] = R(1), [A, p] = R(jn), C = Z(() => {
+function Un() {
+  const [e, r] = R([]), [o, t] = R(0), [n, i] = R(Et), [s, l] = R(!0), [c, d] = R(null), [h, m] = R("all"), [g, f] = R(""), [u, N] = R(1), [A, p] = R(Hn), C = Z(() => {
     l(!0), d(null), F.adminListOrders({ page: u, pageSize: A, email: g, status: h }).then((b) => {
       r(b.list || []), t(b.total || 0), i(b.stats || Et);
-    }).catch((b) => d(Vn(b))).finally(() => l(!1));
+    }).catch((b) => d(jn(b))).finally(() => l(!1));
   }, [g, u, A, h]);
   D(() => {
     const S = setTimeout(C, g ? 300 : 0);
     return () => clearTimeout(S);
   }, [g, C]);
-  const T = Math.max(1, Math.ceil(o / A)), k = (b) => {
+  const B = Math.max(1, Math.ceil(o / A)), k = (b) => {
     m(b), N(1);
   }, E = (b) => {
     f(b), N(1);
   }, w = (b) => {
-    X.includes(b) && (p(b), Hn(b), N(1));
+    X.includes(b) && (p(b), Kn(b), N(1));
   };
   return /* @__PURE__ */ a(ue, { children: /* @__PURE__ */ y("div", { className: "ag-epay-page-body", children: [
     /* @__PURE__ */ y("div", { className: "ag-epay-metrics-grid", children: [
@@ -2332,7 +2339,7 @@ function Fn() {
             {
               ariaLabel: "订单状态",
               onChange: k,
-              options: xn,
+              options: Fn,
               value: h
             }
           ),
@@ -2361,10 +2368,10 @@ function Fn() {
             /* @__PURE__ */ a("th", { "data-slot": "th", scope: "col", children: "创建时间" }),
             /* @__PURE__ */ a("th", { "data-slot": "th", scope: "col", children: "支付时间" })
           ] }) }),
-          /* @__PURE__ */ a("tbody", { "data-slot": "tbody", children: Un({ err: c, list: e, loading: s }) })
+          /* @__PURE__ */ a("tbody", { "data-slot": "tbody", children: zn({ err: c, list: e, loading: s }) })
         ] }) }) }),
         /* @__PURE__ */ a("div", { className: "ag-epay-table-footer table__footer", "data-slot": "table-footer", children: /* @__PURE__ */ a(
-          vn,
+          Cn,
           {
             onPageChange: N,
             onPageSizeChange: w,
@@ -2372,14 +2379,14 @@ function Fn() {
             pageSize: A,
             pageSizeOptions: X,
             total: o,
-            totalPages: T
+            totalPages: B
           }
         ) })
       ] })
     ] })
   ] }) });
 }
-function Un({
+function zn({
   err: e,
   list: r,
   loading: o
@@ -2394,17 +2401,17 @@ function Un({
       t.user_id
     ] }) }),
     /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a("span", { className: "ag-epay-amount", children: $e(t.amount) }) }),
-    /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(he, { format: zn, methods: [t.method].filter(Boolean) }) }),
+    /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(he, { format: $n, methods: [t.method].filter(Boolean) }) }),
     /* @__PURE__ */ a("td", { "data-slot": "td", children: t.provider_id ? /* @__PURE__ */ a("code", { className: "ag-epay-code", children: t.provider_id }) : /* @__PURE__ */ a("span", { className: "ag-epay-text-muted", children: "-" }) }),
-    /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(le, { tone: On(t.status), children: $n(t.status) }) }),
+    /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a(le, { tone: Vn(t.status), children: On(t.status) }) }),
     /* @__PURE__ */ a("td", { "data-slot": "td", children: /* @__PURE__ */ a("span", { className: "ag-epay-code", children: St(t.created_at) }) }),
     /* @__PURE__ */ a("td", { "data-slot": "td", children: t.paid_at ? /* @__PURE__ */ a("span", { className: "ag-epay-code", children: St(t.paid_at) }) : /* @__PURE__ */ a("span", { className: "ag-epay-text-muted", children: "-" }) })
   ] }, t.id));
 }
-function zn(e) {
+function $n(e) {
   return { alipay: "支付宝", wxpay: "微信支付", qqpay: "QQ 钱包" }[e] || e || "-";
 }
-function $n(e) {
+function On(e) {
   return {
     pending: "待支付",
     paid: "已支付",
@@ -2414,7 +2421,7 @@ function $n(e) {
     refunded: "已退款"
   }[e] || e;
 }
-function On(e) {
+function Vn(e) {
   return {
     pending: "warning",
     paid: "success",
@@ -2443,10 +2450,10 @@ function St(e) {
     return e;
   }
 }
-function Vn(e) {
+function jn(e) {
   return e instanceof Error ? e.message : String(e);
 }
-function jn() {
+function Hn() {
   if (typeof window > "u") return X[0];
   try {
     const e = Number(window.localStorage.getItem(Ft));
@@ -2455,7 +2462,7 @@ function jn() {
     return X[0];
   }
 }
-function Hn(e) {
+function Kn(e) {
   try {
     window.localStorage.setItem(Ft, String(e));
   } catch {
@@ -2514,7 +2521,7 @@ const Ut = {
   shadowMd: "0 0 0 0 transparent inset",
   shadowLg: "0 0 1px 0 #ffffff4d inset",
   shadowGlow: "0 0 0 1px color-mix(in oklab, oklch(0.9848 0 0) 18%, transparent)"
-}, Kn = {
+}, Gn = {
   radiusSm: "0.25rem",
   radiusMd: "0.25rem",
   radiusLg: "0.25rem",
@@ -2524,24 +2531,24 @@ const Ut = {
   fontMono: "'Geist Mono', 'SF Mono', 'Cascadia Code', monospace",
   transition: "200ms cubic-bezier(0.4, 0, 0.2, 1)",
   transitionSlow: "400ms cubic-bezier(0.4, 0, 0.2, 1)"
-}, Gn = {
+}, Jn = {
   sidebarWidth: "260px",
   sidebarCollapsed: "72px",
   topbarHeight: "64px"
 }, Ve = {
-  ...Kn,
-  ...Gn
+  ...Gn,
+  ...Jn
 }, zt = {
   dark: Ut
 };
-function Jn(e) {
+function Yn(e) {
   return e.replace(/[A-Z]/g, (r) => "-" + r.toLowerCase());
 }
 function $t(e = "ag") {
   return e.trim() || "ag";
 }
 function ge(e, r) {
-  return `--${e}-${Jn(r)}`;
+  return `--${e}-${Yn(r)}`;
 }
 Object.keys(zt.dark).reduce((e, r) => (e[r] = ge("ag", r), e), {});
 Object.keys(Ve).reduce((e, r) => (e[r] = ge("ag", r), e), {});
@@ -2553,9 +2560,9 @@ function Vt(e = {}) {
   const r = $t(e.prefix);
   return Object.keys(Ve).reduce((o, t) => (o[t] = ge(r, t), o), {});
 }
-const Yn = Ot(), Qn = Vt();
+const Qn = Ot(), Wn = Vt();
 function H(e, r = {}) {
-  const o = r.prefix ? Ot(r) : Yn, t = r.prefix ? Vt(r) : Qn;
+  const o = r.prefix ? Ot(r) : Qn, t = r.prefix ? Vt(r) : Wn;
   if (e in o) {
     const i = e;
     return `var(${o[i]}, ${Ut[i]})`;
@@ -2563,22 +2570,22 @@ function H(e, r = {}) {
   const n = e;
   return `var(${t[n]}, ${Ve[n]})`;
 }
-let Wn = 0;
-function Zn() {
+let Zn = 0;
+function Xn() {
   const [e, r] = R([]), o = de(r);
   o.current = r;
   const t = Z((l) => {
     o.current((c) => c.filter((d) => d.id !== l));
   }, []), n = Z((l, c) => {
-    const d = Wn++;
+    const d = Zn++;
     o.current((h) => [...h, { id: d, type: l, text: c }]), setTimeout(() => t(d), 4e3);
   }, [t]), i = Z((l) => n("success", l), [n]), s = Z((l) => n("error", l), [n]);
   return {
     toast: { success: i, error: s },
-    Toaster: /* @__PURE__ */ a(Xn, { messages: e, onClose: t })
+    Toaster: /* @__PURE__ */ a(ea, { messages: e, onClose: t })
   };
 }
-function Xn({
+function ea({
   messages: e,
   onClose: r
 }) {
@@ -2591,9 +2598,9 @@ function Xn({
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }`, document.head.appendChild(t);
-  }, []), e.length === 0 ? null : /* @__PURE__ */ a("div", { style: ta, children: e.map((o) => /* @__PURE__ */ a(ea, { message: o, onClose: () => r(o.id) }, o.id)) });
+  }, []), e.length === 0 ? null : /* @__PURE__ */ a("div", { style: na, children: e.map((o) => /* @__PURE__ */ a(ta, { message: o, onClose: () => r(o.id) }, o.id)) });
 }
-function ea({
+function ta({
   message: e,
   onClose: r
 }) {
@@ -2602,18 +2609,18 @@ function ea({
     "div",
     {
       style: {
-        ...na,
+        ...aa,
         borderColor: n
       },
       children: [
-        /* @__PURE__ */ a("span", { style: { ...aa, color: t }, children: o ? "✓" : "✕" }),
-        /* @__PURE__ */ a("span", { style: { ...ra, color: H("text") }, children: e.text }),
-        /* @__PURE__ */ a("button", { onClick: r, style: ia, "aria-label": "关闭", children: "×" })
+        /* @__PURE__ */ a("span", { style: { ...ra, color: t }, children: o ? "✓" : "✕" }),
+        /* @__PURE__ */ a("span", { style: { ...ia, color: H("text") }, children: e.text }),
+        /* @__PURE__ */ a("button", { onClick: r, style: oa, "aria-label": "关闭", children: "×" })
       ]
     }
   );
 }
-const ta = {
+const na = {
   position: "fixed",
   top: 20,
   right: 20,
@@ -2622,7 +2629,7 @@ const ta = {
   flexDirection: "column",
   gap: 10,
   pointerEvents: "none"
-}, na = {
+}, aa = {
   pointerEvents: "auto",
   display: "flex",
   alignItems: "center",
@@ -2635,17 +2642,17 @@ const ta = {
   background: H("bgElevated"),
   boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
   animation: "airgate-epay-toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
-}, aa = {
+}, ra = {
   fontSize: 16,
   fontWeight: 700,
   width: 18,
   textAlign: "center",
   flexShrink: 0
-}, ra = {
+}, ia = {
   flex: 1,
   fontSize: 13,
   lineHeight: 1.4
-}, ia = {
+}, oa = {
   flexShrink: 0,
   background: "transparent",
   border: "none",
@@ -2662,8 +2669,8 @@ function jt(e, r) {
   const o = window;
   return (t = o.airgate) != null && t.confirm ? o.airgate.confirm(e, r) : Promise.resolve(window.confirm(e));
 }
-function oa() {
-  const [e, r] = R([]), [o, t] = R([]), [n, i] = R(!0), [s, l] = R(null), [c, d] = R(null), { toast: h, Toaster: m } = Zn(), g = Z(() => {
+function sa() {
+  const [e, r] = R([]), [o, t] = R([]), [n, i] = R(!0), [s, l] = R(null), [c, d] = R(null), { toast: h, Toaster: m } = Xn(), g = Z(() => {
     i(!0), l(null), F.adminListProviders().then((p) => {
       r(p.providers || []), t(p.kinds || []);
     }).catch((p) => l(se(p))).finally(() => i(!1));
@@ -2677,7 +2684,7 @@ function oa() {
       id: "",
       kind: p.kind,
       enabled: !0,
-      config: ua(p)
+      config: ha(p)
     });
   }, u = (p) => {
     d({
@@ -2695,8 +2702,8 @@ function oa() {
     }))
       try {
         await F.adminDeleteProvider(p), h.success(`已删除 ${p}`), g();
-      } catch (T) {
-        h.error(`删除失败: ${se(T)}`);
+      } catch (B) {
+        h.error(`删除失败: ${se(B)}`);
       }
   }, A = async (p) => {
     try {
@@ -2727,9 +2734,10 @@ function oa() {
               /* @__PURE__ */ a("div", { className: "ag-epay-provider-meta", children: p.kind })
             ] }),
             /* @__PURE__ */ a("div", { className: "ag-epay-kind-description", children: p.description }),
+            p.technical_detail ? /* @__PURE__ */ a("div", { className: "ag-epay-kind-technical", children: p.technical_detail }) : null,
             /* @__PURE__ */ a(he, { format: je, methods: p.supported_methods }),
             /* @__PURE__ */ y(L, { variant: "primary", onClick: () => f(p), children: [
-              /* @__PURE__ */ a(kn, { className: "ag-epay-icon" }),
+              /* @__PURE__ */ a(En, { className: "ag-epay-icon" }),
               "添加"
             ] })
           ] }, p.kind)) })
@@ -2749,7 +2757,7 @@ function oa() {
               /* @__PURE__ */ a("th", { "data-slot": "th", scope: "col", children: "运行状态" }),
               /* @__PURE__ */ a("th", { "data-slot": "th", scope: "col", children: "操作" })
             ] }) }),
-            /* @__PURE__ */ a("tbody", { "data-slot": "tbody", children: sa({
+            /* @__PURE__ */ a("tbody", { "data-slot": "tbody", children: la({
               err: s,
               loading: n,
               providers: e,
@@ -2761,7 +2769,7 @@ function oa() {
         }
       ),
       c ? /* @__PURE__ */ a(
-        la,
+        ca,
         {
           editing: c,
           kinds: o,
@@ -2775,7 +2783,7 @@ function oa() {
     ] })
   ] });
 }
-function sa({
+function la({
   err: e,
   loading: r,
   onDelete: o,
@@ -2805,7 +2813,7 @@ function sa({
     ] }, s.id);
   });
 }
-function la({
+function ca({
   editing: e,
   kinds: r,
   onCancel: o,
@@ -2891,7 +2899,7 @@ function la({
           }
         ) }),
         d == null ? void 0 : d.field_descriptors.map((g) => /* @__PURE__ */ a(
-          ca,
+          da,
           {
             field: g,
             meta: d,
@@ -2904,15 +2912,15 @@ function la({
     }
   );
 }
-function ca({
+function da({
   field: e,
   meta: r,
   onChange: o,
   value: t
 }) {
-  return /* @__PURE__ */ a(ce, { description: e.description, label: e.label, required: e.required, children: da({ field: e, meta: r, onChange: o, value: t }) });
+  return /* @__PURE__ */ a(ce, { description: e.description, label: e.label, required: e.required, children: ua({ field: e, meta: r, onChange: o, value: t }) });
 }
-function da({
+function ua({
   field: e,
   meta: r,
   onChange: o,
@@ -2934,7 +2942,7 @@ function da({
       onChange: (n) => o(n ? "true" : "false")
     }
   ) : e.type === "method-multi" ? /* @__PURE__ */ a(
-    Cn,
+    kn,
     {
       candidates: r.supported_methods,
       format: je,
@@ -2952,7 +2960,7 @@ function da({
     }
   );
 }
-function ua(e) {
+function ha(e) {
   const r = {};
   for (const o of e.field_descriptors)
     r[o.key] = o.type === "bool" ? "false" : "";
@@ -2964,14 +2972,14 @@ function je(e) {
 function se(e) {
   return e instanceof Error ? e.message : String(e);
 }
-const fa = {
+const pa = {
   routes: [
-    { path: "/recharge", component: _n },
-    { path: "/orders", component: Rn },
-    { path: "/admin/orders", component: Fn },
-    { path: "/admin/providers", component: oa }
+    { path: "/recharge", component: Mn },
+    { path: "/orders", component: An },
+    { path: "/admin/orders", component: Un },
+    { path: "/admin/providers", component: sa }
   ]
 };
 export {
-  fa as default
+  pa as default
 };

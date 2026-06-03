@@ -1,8 +1,8 @@
 // 与 core 后端 ext-user 入口通信的薄封装。
 //
-// core 把 JWT 存在 localStorage('token')，并通过 Authorization: Bearer 头发送，
+// core 把 JWT 存在 sessionStorage('token')，并通过 Authorization: Bearer 头发送，
 // 而不是 cookie。插件前端是独立打包的 ESM bundle，没有共享 core 的 client.ts，
-// 这里手动从 localStorage 取 token 拼到请求头里。
+// 这里手动从 sessionStorage 取 token 拼到请求头里。
 //
 // 注意：所有 user 级路径都走 /api/v1/ext-user/payment-epay/...
 // 回调路径不在前端使用。
@@ -16,12 +16,20 @@ interface CoreApiResp<T> {
   data?: T;
 }
 
+function getStoredToken(): string {
+  try {
+    return sessionStorage.getItem('token') || '';
+  } catch {
+    return '';
+  }
+}
+
 async function request<T>(method: string, path: string, body?: unknown, opts?: { admin?: boolean }): Promise<T> {
   const headers: Record<string, string> = {};
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json';
   }
-  const token = localStorage.getItem('token');
+  const token = getStoredToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -50,11 +58,6 @@ async function request<T>(method: string, path: string, body?: unknown, opts?: {
       wrapper?.message ||
       (raw as { error?: string } | null)?.error ||
       `HTTP ${resp.status}`;
-    if (resp.status === 401) {
-      // core 一致行为：401 时清 token 并跳登录
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
     throw new Error(errMsg);
   }
 
