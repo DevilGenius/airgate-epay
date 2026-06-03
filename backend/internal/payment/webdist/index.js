@@ -1520,7 +1520,7 @@ var bn = yn();
 const It = /* @__PURE__ */ Yt(bn), wn = "/api/v1/ext-user/payment-epay", Nn = "/api/v1/ext/payment-epay";
 function vn() {
   try {
-    return sessionStorage.getItem("token") || "";
+    return sessionStorage.getItem("token") || localStorage.getItem("token") || "";
   } catch {
     return "";
   }

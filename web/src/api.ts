@@ -1,8 +1,8 @@
 // 与 core 后端 ext-user 入口通信的薄封装。
 //
-// core 把 JWT 存在 sessionStorage('token')，并通过 Authorization: Bearer 头发送，
+// core 默认把 JWT 存在 sessionStorage('token')，勾选记住登录后也会写入 localStorage('token')，
 // 而不是 cookie。插件前端是独立打包的 ESM bundle，没有共享 core 的 client.ts，
-// 这里手动从 sessionStorage 取 token 拼到请求头里。
+// 这里手动从浏览器存储取 token 拼到请求头里。
 //
 // 注意：所有 user 级路径都走 /api/v1/ext-user/payment-epay/...
 // 回调路径不在前端使用。
@@ -18,7 +18,7 @@ interface CoreApiResp<T> {
 
 function getStoredToken(): string {
   try {
-    return sessionStorage.getItem('token') || '';
+    return sessionStorage.getItem('token') || localStorage.getItem('token') || '';
   } catch {
     return '';
   }
