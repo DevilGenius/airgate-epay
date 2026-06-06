@@ -112,6 +112,29 @@
   gap: 0.5rem;
 }
 
+.ag-epay-toolbar :where(.ag-epay-control, .ag-epay-button),
+.ag-epay-panel-header .ag-epay-toolbar-actions :where(.ag-epay-button) {
+  height: 2.5rem;
+  min-height: 2.5rem;
+}
+
+.ag-epay-toolbar :where(.ag-epay-control, .ag-epay-button),
+.ag-epay-panel-header .ag-epay-toolbar-actions :where(.ag-epay-button) {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ag-epay-toolbar .ag-epay-button,
+.ag-epay-panel-header .ag-epay-toolbar-actions .ag-epay-button {
+  padding-block: 0;
+}
+
+.ag-epay-toolbar .ag-epay-button--icon,
+.ag-epay-panel-header .ag-epay-toolbar-actions .ag-epay-button--icon {
+  width: 2.5rem;
+  min-width: 2.5rem;
+}
+
 .ag-epay-metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));

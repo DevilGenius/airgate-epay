@@ -23,6 +23,7 @@ tmp/
 # Frontend
 web/node_modules/
 web/dist/
+backend/internal/payment/webdist/
 
 # IDE
 .idea/
