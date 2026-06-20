@@ -3,7 +3,8 @@ module github.com/DouDOU-start/airgate-epay/backend
 go 1.26.3
 
 require (
-	github.com/DevilGenius/airgate-sdk v0.2.2
+	github.com/DATA-DOG/go-sqlmock v1.5.2
+	github.com/DevilGenius/airgate-sdk v0.2.3
 	github.com/lib/pq v1.10.9
 	github.com/smartwalle/alipay/v3 v3.2.29
 	github.com/wechatpay-apiv3/wechatpay-go v0.2.21
