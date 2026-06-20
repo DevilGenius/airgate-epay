@@ -12,7 +12,7 @@ package main
 import (
 	sdkgrpc "github.com/DevilGenius/airgate-sdk/runtimego/grpc"
 
-	"github.com/DouDOU-start/airgate-epay/backend/internal/payment"
+	"github.com/DevilGenius/airgate-epay/backend/internal/payment"
 )
 
 func main() {

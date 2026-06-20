@@ -1,4 +1,4 @@
-module github.com/DouDOU-start/airgate-epay/backend
+module github.com/DevilGenius/airgate-epay/backend
 
 go 1.26.3
 

@@ -15,7 +15,7 @@ import (
 
 	sdk "github.com/DevilGenius/airgate-sdk/sdkgo"
 
-	"github.com/DouDOU-start/airgate-epay/backend/internal/payment/provider"
+	"github.com/DevilGenius/airgate-epay/backend/internal/payment/provider"
 )
 
 // Order 订单领域模型（service / handler 层共用）

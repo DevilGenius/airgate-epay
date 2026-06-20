@@ -15,7 +15,7 @@ const (
 //
 // 这里是 var 而不是 const，是为了让 release CI 通过 ldflags 把 git tag 注入进来：
 //
-//	go build -ldflags "-X 'github.com/DouDOU-start/airgate-epay/backend/internal/payment.PluginVersion=0.1.0'"
+//	go build -ldflags "-X 'github.com/DevilGenius/airgate-epay/backend/internal/payment.PluginVersion=0.1.0'"
 //
 // 默认值仅用于本地开发；正式发版的版本号永远来自 git tag（去掉 v 前缀）。
 var PluginVersion = "0.1.0"

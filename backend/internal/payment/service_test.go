@@ -15,7 +15,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
-	"github.com/DouDOU-start/airgate-epay/backend/internal/payment/provider"
+	"github.com/DevilGenius/airgate-epay/backend/internal/payment/provider"
 )
 
 type fakeProvider struct {

@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/DevilGenius/airgate-sdk/sdkgo"
 
-	"github.com/DouDOU-start/airgate-epay/backend/internal/payment/provider"
+	"github.com/DevilGenius/airgate-epay/backend/internal/payment/provider"
 )
 
 // Plugin 是支付插件主体，实现 sdk.ExtensionPlugin。

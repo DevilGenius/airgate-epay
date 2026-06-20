@@ -18,7 +18,7 @@ import (
 
 	sdk "github.com/DevilGenius/airgate-sdk/sdkgo"
 
-	"github.com/DouDOU-start/airgate-epay/backend/internal/payment"
+	"github.com/DevilGenius/airgate-epay/backend/internal/payment"
 )
 
 const generatedComment = "# 本文件由 backend/cmd/genmanifest 自动生成，请勿手工修改。\n\n"

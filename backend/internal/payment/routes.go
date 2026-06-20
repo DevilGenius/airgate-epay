@@ -11,7 +11,7 @@ import (
 
 	sdk "github.com/DevilGenius/airgate-sdk/sdkgo"
 
-	"github.com/DouDOU-start/airgate-epay/backend/internal/payment/provider"
+	"github.com/DevilGenius/airgate-epay/backend/internal/payment/provider"
 )
 
 // HTTP header 名称（与 core/extension_proxy.go 透传的头一致）
