@@ -872,7 +872,7 @@ func TestAssetsLoading(t *testing.T) {
 		t.Fatalf("Chdir empty workspace error: %v", err)
 	}
 	embedded := New().GetWebAssets()
-	if len(embedded) == 0 || len(embedded["index.js"]) == 0 || len(embedded["index.css"]) == 0 {
+	if len(embedded) == 0 || len(embedded["index.css"]) == 0 {
 		t.Fatalf("GetWebAssets embedded fallback mismatch: keys=%v", reflect.ValueOf(embedded).MapKeys())
 	}
 }

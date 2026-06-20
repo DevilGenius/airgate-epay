@@ -72,6 +72,7 @@ describe('plugin pages', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     document.getElementById('airgate-epay-toast-keyframes')?.remove();
   });
@@ -144,6 +145,76 @@ describe('plugin pages', () => {
     expect(screen.queryByText('扫码付款')).toBeNull();
   });
 
+  it('handles recharge validation, rejected submits, and terminal unpaid orders', async () => {
+    apiMock.methods.mockResolvedValueOnce({
+      configured: true,
+      methods: [{ key: 'alipay', label: '支付宝', icon: 'alipay' }],
+    });
+    apiMock.createOrder.mockRejectedValueOnce('plain failure');
+    render(<RechargePage />);
+    expect(await screen.findByText('选择金额')).not.toBeNull();
+
+    fireEvent.change(document.querySelector('.ag-epay-amount-input') as HTMLInputElement, {
+      target: { value: '0' },
+    });
+    fireEvent.click(screen.getByText('立即支付'));
+    expect(screen.getByText('请输入有效金额')).not.toBeNull();
+
+    fireEvent.change(document.querySelector('.ag-epay-amount-input') as HTMLInputElement, {
+      target: { value: '30' },
+    });
+    fireEvent.click(screen.getByText('立即支付'));
+    expect(await screen.findByText('plain failure')).not.toBeNull();
+    cleanup();
+
+    apiMock.methods.mockResolvedValueOnce({
+      configured: true,
+      methods: [{ key: 'wxpay', label: '微信支付', icon: 'wxpay' }],
+    });
+    apiMock.createOrder.mockResolvedValueOnce({ ...baseOrder, method: 'wxpay', status: 'expired' });
+    render(<RechargePage />);
+    fireEvent.click(await screen.findByText('立即支付'));
+    expect(await screen.findByText('订单已过期')).not.toBeNull();
+    fireEvent.click(screen.getByText('重新发起'));
+    expect(screen.getByText('选择金额')).not.toBeNull();
+  });
+
+  it('polls user orders and handles QR generation failures', async () => {
+    apiMock.listOrders.mockResolvedValue({ list: [baseOrder] });
+    apiMock.getOrder.mockResolvedValue({ ...baseOrder, status: 'paid', paid_at: '2026-01-01T00:05:00Z' });
+    const intervalSpy = vi.spyOn(window, 'setInterval').mockImplementation((handler: TimerHandler) => {
+      if (typeof handler === 'function') void handler();
+      return 1;
+    });
+    const clearIntervalSpy = vi.spyOn(window, 'clearInterval').mockImplementation(() => undefined);
+    const { unmount } = render(<OrdersPage />);
+    expect(await screen.findByText('AG1')).not.toBeNull();
+    fireEvent.click(screen.getByText('继续支付'));
+    expect(await screen.findByText('扫码付款')).not.toBeNull();
+    expect(apiMock.getOrder).toHaveBeenCalledWith('AG1');
+    expect(await screen.findByText('支付成功')).not.toBeNull();
+    unmount();
+    intervalSpy.mockRestore();
+    clearIntervalSpy.mockRestore();
+    cleanup();
+
+    qrMock.toDataURL.mockRejectedValueOnce(new Error('qr failed'));
+    apiMock.listOrders.mockResolvedValueOnce({ list: [baseOrder] });
+    render(<OrdersPage />);
+    expect(await screen.findByText('AG1')).not.toBeNull();
+    fireEvent.click(screen.getByText('继续支付'));
+    expect(await screen.findByText('生成二维码中...')).not.toBeNull();
+    await waitFor(() => expect(screen.queryByAltText('付款二维码')).toBeNull());
+    cleanup();
+
+    apiMock.listOrders.mockResolvedValueOnce({
+      list: [{ ...baseOrder, payment_url: '', qr_code_content: '', status: 'pending' }],
+    });
+    render(<OrdersPage />);
+    expect(await screen.findByText('AG1')).not.toBeNull();
+    expect(screen.queryByText('继续支付')).toBeNull();
+  });
+
   it('loads admin orders, filters by status/email, and changes page size', async () => {
     apiMock.adminListOrders.mockResolvedValue({
       list: [{ ...baseOrder, user_email: 'user@example.com', status: 'paid', paid_at: '2026-01-01T00:05:00Z' }],
@@ -177,6 +248,23 @@ describe('plugin pages', () => {
     await waitFor(() => expect(apiMock.adminListOrders).toHaveBeenLastCalledWith(expect.objectContaining({ pageSize: 50, page: 1 })));
   });
 
+  it('renders admin orders error and empty states with stored page size', async () => {
+    localStorage.setItem('payment-epay.admin-orders.page-size', '100');
+    apiMock.adminListOrders.mockResolvedValueOnce({
+      list: [],
+      total: 0,
+      stats: undefined,
+    });
+    const { unmount } = render(<AdminOrdersPage />);
+    expect(await screen.findByText('暂无订单')).not.toBeNull();
+    expect(apiMock.adminListOrders).toHaveBeenLastCalledWith(expect.objectContaining({ pageSize: 100 }));
+    unmount();
+
+    apiMock.adminListOrders.mockRejectedValueOnce('admin failed');
+    render(<AdminOrdersPage />);
+    expect(await screen.findByText('加载失败: admin failed')).not.toBeNull();
+  });
+
   it('renders admin providers and handles edit, toggle, and delete actions', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     apiMock.adminListProviders.mockResolvedValue({ providers: [providerItem], kinds: [providerKind] });
@@ -205,5 +293,52 @@ describe('plugin pages', () => {
 
     fireEvent.click(screen.getByText('删除'));
     await waitFor(() => expect(apiMock.adminDeleteProvider).toHaveBeenCalledWith('cai'));
+  });
+
+  it('renders provider error and empty states, validates create forms, and honors cancelled confirms', async () => {
+    apiMock.adminListProviders.mockRejectedValueOnce('provider failed');
+    const { unmount } = render(<AdminProvidersPage />);
+    expect((await screen.findAllByText('加载失败: provider failed')).length).toBe(2);
+    unmount();
+
+    apiMock.adminListProviders.mockResolvedValueOnce({ providers: [], kinds: [] });
+    render(<AdminProvidersPage />);
+    expect(await screen.findByText('暂无可添加的服务商类型')).not.toBeNull();
+    expect(screen.getByText('暂未配置任何服务商')).not.toBeNull();
+    cleanup();
+
+    const detailedKind = {
+      ...providerKind,
+      field_descriptors: [
+        { key: 'pid', label: 'PID', type: 'text', required: true, placeholder: '输入 PID' },
+        { key: 'key', label: 'Key', type: 'password', required: true, placeholder: '输入 Key' },
+        { key: 'note', label: '备注', type: 'textarea', placeholder: '输入备注' },
+        { key: 'sandbox', label: '沙箱模式', type: 'bool' },
+        { key: 'enabled_methods', label: '启用的支付方式', type: 'method-multi', required: true },
+      ],
+    };
+    apiMock.adminListProviders.mockResolvedValueOnce({ providers: [], kinds: [detailedKind] });
+    apiMock.adminUpsertProvider.mockRejectedValueOnce(new Error('save failed'));
+    render(<AdminProvidersPage />);
+    fireEvent.click(await screen.findByText('添加'));
+    expect(await screen.findByText('添加服务商 - 彩虹易支付')).not.toBeNull();
+    fireEvent.click(screen.getByText('保存'));
+    expect(await screen.findByText('「PID」必填')).not.toBeNull();
+
+    fireEvent.change(screen.getByPlaceholderText('输入 PID'), { target: { value: 'p' } });
+    fireEvent.change(screen.getByPlaceholderText('输入 Key'), { target: { value: 'k' } });
+    fireEvent.change(screen.getByPlaceholderText('输入备注'), { target: { value: 'hello' } });
+    fireEvent.click(screen.getByLabelText('已关闭'));
+    fireEvent.click(screen.getByLabelText('支付宝'));
+    fireEvent.click(screen.getByText('保存'));
+    expect(await screen.findByText('保存失败: save failed')).not.toBeNull();
+    cleanup();
+
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    apiMock.adminListProviders.mockResolvedValueOnce({ providers: [providerItem], kinds: [providerKind] });
+    render(<AdminProvidersPage />);
+    expect(await screen.findByText('彩虹易支付')).not.toBeNull();
+    fireEvent.click(screen.getByText('删除'));
+    await waitFor(() => expect(apiMock.adminDeleteProvider).not.toHaveBeenCalled());
   });
 });
