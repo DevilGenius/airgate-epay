@@ -2,7 +2,7 @@
 
 id: payment-epay
 name: 支付插件
-version: 0.1.0
+version: 0.2.4
 description: 多渠道支付插件：易支付（虎皮椒/彩虹）/ 支付宝官方 / 微信支付官方
 author: AirGate
 type: extension

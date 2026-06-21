@@ -64,7 +64,7 @@ jobs:
           echo "Injecting PluginVersion=${VERSION}"
           mkdir -p bin
           cd backend && go build -buildvcs=false -trimpath \
-            -ldflags "-X 'github.com/DouDOU-start/airgate-epay/backend/internal/payment.PluginVersion=${VERSION}'" \
+            -ldflags "-X 'github.com/DevilGenius/airgate-epay/backend/internal/payment.PluginVersion=${VERSION}'" \
             -o ../bin/payment-epay-${{ matrix.goos }}-${{ matrix.goarch }} .
 
       - name: Generate SHA256
