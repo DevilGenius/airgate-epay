@@ -182,10 +182,12 @@ describe('plugin pages', () => {
   it('polls user orders and handles QR generation failures', async () => {
     apiMock.listOrders.mockResolvedValue({ list: [baseOrder] });
     apiMock.getOrder.mockResolvedValue({ ...baseOrder, status: 'paid', paid_at: '2026-01-01T00:05:00Z' });
-    const intervalSpy = vi.spyOn(window, 'setInterval').mockImplementation((handler: TimerHandler) => {
-      if (typeof handler === 'function') void handler();
-      return 1;
-    });
+    const intervalSpy = vi
+      .spyOn(window, 'setInterval')
+      .mockImplementation((callback: (...args: unknown[]) => void, _delay?: number, ...args: unknown[]) => {
+        callback(...args);
+        return 1 as unknown as ReturnType<typeof window.setInterval>;
+      });
     const clearIntervalSpy = vi.spyOn(window, 'clearInterval').mockImplementation(() => undefined);
     const { unmount } = render(<OrdersPage />);
     expect(await screen.findByText('AG1')).not.toBeNull();
