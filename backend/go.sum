@@ -1,7 +1,7 @@
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
 github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
-github.com/DevilGenius/airgate-sdk v0.2.4 h1:W6LnetADAGmLfkgyBqm93f7ZrQ/quAIle6WvMyZf4og=
-github.com/DevilGenius/airgate-sdk v0.2.4/go.mod h1:EnjPPVBiONFv0gcQqiBPqs86HRhcVKICdFaB03yJcI8=
+github.com/DevilGenius/airgate-sdk v0.2.5 h1:16NU37FDMGk7YFrUz4iYdhbgd/kauiwvviCguojLwO0=
+github.com/DevilGenius/airgate-sdk v0.2.5/go.mod h1:EnjPPVBiONFv0gcQqiBPqs86HRhcVKICdFaB03yJcI8=
 github.com/agiledragon/gomonkey v2.0.2+incompatible h1:eXKi9/piiC3cjJD1658mEE2o3NjkJ5vDLgYjCQu0Xlw=
 github.com/agiledragon/gomonkey v2.0.2+incompatible/go.mod h1:2NGfXu1a80LLr2cmWXGBDaHEjb1idR6+FVlX5T3D9hw=
 github.com/bufbuild/protocompile v0.14.1 h1:iA73zAf/fyljNjQKwYzUHD6AD4R8KMasmwa/FBatYVw=
