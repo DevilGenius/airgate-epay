@@ -351,6 +351,19 @@ func TestMarkPaidBranches(t *testing.T) {
 		assertSQLExpectations(t, mock)
 	})
 
+	t.Run("invalid callback amount", func(t *testing.T) {
+		svc, _, db, mock := newMockService(t, ServiceOptions{})
+		defer func() { _ = db.Close() }()
+		mock.ExpectBegin()
+		expectOrderLock(mock, "AG1", "pending", provider.MethodAlipay, "fake", 20)
+		mock.ExpectRollback()
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 0})
+		if err == nil || !strings.Contains(err.Error(), "回调金额缺失或无效") {
+			t.Fatalf("markPaid invalid amount error = %v", err)
+		}
+		assertSQLExpectations(t, mock)
+	})
+
 	t.Run("amount mismatch", func(t *testing.T) {
 		svc, _, db, mock := newMockService(t, ServiceOptions{})
 		defer func() { _ = db.Close() }()

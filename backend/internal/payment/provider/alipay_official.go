@@ -160,11 +160,16 @@ func (p *alipayOfficialProvider) VerifyCallback(ctx context.Context, req Callbac
 		return nil, fmt.Errorf("%w: %v", ErrInvalidSignature, err)
 	}
 
-	amount, _ := strconv.ParseFloat(form.Get("total_amount"), 64)
 	status := "pending"
+	var amount float64
 	switch form.Get("trade_status") {
 	case "TRADE_SUCCESS", "TRADE_FINISHED":
 		status = "paid"
+		var err error
+		amount, err = parsePositiveCallbackAmount("total_amount", form.Get("total_amount"))
+		if err != nil {
+			return nil, err
+		}
 	case "TRADE_CLOSED":
 		status = "failed"
 	}

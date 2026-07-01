@@ -131,10 +131,15 @@ func (p *caihongProvider) VerifyCallback(_ context.Context, req CallbackRequest)
 		return nil, ErrInvalidSignature
 	}
 
-	amount, _ := strconv.ParseFloat(form.Get("money"), 64)
 	status := "pending"
+	var amount float64
 	if form.Get("trade_status") == "TRADE_SUCCESS" {
 		status = "paid"
+		var err error
+		amount, err = parsePositiveCallbackAmount("money", form.Get("money"))
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &CallbackResult{
 		OutTradeNo: form.Get("out_trade_no"),

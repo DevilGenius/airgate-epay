@@ -200,6 +200,9 @@ func (p *easyPayProvider) VerifyCallback(_ context.Context, req CallbackRequest)
 
 	status := "pending"
 	if payload.Status == "paid" {
+		if payload.Amount <= 0 {
+			return nil, fmt.Errorf("paid callback invalid amount field %q", "amount")
+		}
 		status = "paid"
 	}
 

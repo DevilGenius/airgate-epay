@@ -240,6 +240,9 @@ func (p *wxpayOfficialProvider) VerifyCallback(ctx context.Context, req Callback
 	if txn.Amount != nil && txn.Amount.Total != nil {
 		amount = float64(*txn.Amount.Total) / 100.0 // 分转元
 	}
+	if status == "paid" && amount <= 0 {
+		return nil, fmt.Errorf("paid callback invalid amount field %q", "amount.total")
+	}
 
 	// 微信 V3 要求响应 JSON：{"code":"SUCCESS","message":"成功"}
 	return &CallbackResult{

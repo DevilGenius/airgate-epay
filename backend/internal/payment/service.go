@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -316,7 +317,10 @@ func (s *Service) markPaid(ctx context.Context, callbackProviderID string, cb *p
 	}
 
 	// 2) 金额校验（允许 1 分钱误差）
-	if cb.Amount > 0 && absDiff(cb.Amount, amount) > 0.01 {
+	if cb.Amount <= 0 || math.IsNaN(cb.Amount) || math.IsInf(cb.Amount, 0) {
+		return errors.New("回调金额缺失或无效")
+	}
+	if absDiff(cb.Amount, amount) > 0.01 {
 		return fmt.Errorf("回调金额 %.2f 与订单金额 %.2f 不匹配", cb.Amount, amount)
 	}
 

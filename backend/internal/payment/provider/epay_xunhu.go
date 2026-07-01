@@ -27,8 +27,8 @@ import (
 func init() {
 	Register(KindEpayXunhu, buildXunhu)
 	RegisterKindMeta(KindMeta{
-		Kind:        KindEpayXunhu,
-		Name:        "虎皮椒 V3",
+		Kind:            KindEpayXunhu,
+		Name:            "虎皮椒 V3",
 		Description:     "对接虎皮椒 V3 协议，适合虎皮椒及兼容平台；支持支付宝、微信支付。",
 		TechnicalDetail: "POST do.html，appid+appsecret 签名。",
 		// 协议层支持的所有方式；admin 在配置时通过 enabled_methods 字段勾选实际启用的子集
@@ -172,10 +172,15 @@ func (p *xunhuProvider) VerifyCallback(_ context.Context, req CallbackRequest) (
 		return nil, ErrInvalidSignature
 	}
 
-	amount, _ := strconv.ParseFloat(form.Get("total_fee"), 64)
 	status := "pending"
+	var amount float64
 	if form.Get("status") == "OD" {
 		status = "paid"
+		var err error
+		amount, err = parsePositiveCallbackAmount("total_fee", form.Get("total_fee"))
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &CallbackResult{
 		OutTradeNo: form.Get("trade_order_id"),
