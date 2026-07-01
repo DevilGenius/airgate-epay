@@ -303,7 +303,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		svc, _, db, mock := newMockService(t, ServiceOptions{})
 		defer func() { _ = db.Close() }()
 		mock.ExpectBegin()
-		mock.ExpectQuery("SELECT id, user_id, amount, status, method, provider_id FROM payment_orders").
+		mock.ExpectQuery("SELECT id, user_id, amount, status, method, provider_id, expires_at FROM payment_orders").
 			WithArgs("AG1").WillReturnError(sql.ErrNoRows)
 		mock.ExpectRollback()
 		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1"})
@@ -334,6 +334,20 @@ func TestMarkPaidBranches(t *testing.T) {
 		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
 		if err == nil || !strings.Contains(err.Error(), "订单状态不允许") {
 			t.Fatalf("markPaid invalid status error = %v", err)
+		}
+		assertSQLExpectations(t, mock)
+	})
+
+	t.Run("expired order", func(t *testing.T) {
+		svc, _, db, mock := newMockService(t, ServiceOptions{})
+		defer func() { _ = db.Close() }()
+		mock.ExpectBegin()
+		expectOrderLockWithExpiry(mock, "AG1", "pending", provider.MethodAlipay, "fake", 20, time.Now().Add(-time.Minute))
+		mock.ExpectExec("UPDATE payment_orders").WithArgs(int64(1)).WillReturnResult(sqlmock.NewResult(0, 1))
+		mock.ExpectCommit()
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		if err == nil || !strings.Contains(err.Error(), "订单已过期") {
+			t.Fatalf("markPaid expired order error = %v", err)
 		}
 		assertSQLExpectations(t, mock)
 	})
@@ -560,10 +574,14 @@ func TestAvailableMethodsExpireAndHelpers(t *testing.T) {
 }
 
 func expectOrderLock(mock sqlmock.Sqlmock, outTradeNo, status, method, providerID string, amount float64) {
-	mock.ExpectQuery("SELECT id, user_id, amount, status, method, provider_id FROM payment_orders").
+	expectOrderLockWithExpiry(mock, outTradeNo, status, method, providerID, amount, time.Now().Add(time.Hour))
+}
+
+func expectOrderLockWithExpiry(mock sqlmock.Sqlmock, outTradeNo, status, method, providerID string, amount float64, expiresAt time.Time) {
+	mock.ExpectQuery("SELECT id, user_id, amount, status, method, provider_id, expires_at FROM payment_orders").
 		WithArgs(outTradeNo).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "amount", "status", "method", "provider_id"}).
-			AddRow(int64(1), int64(7), amount, status, method, providerID))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "amount", "status", "method", "provider_id", "expires_at"}).
+			AddRow(int64(1), int64(7), amount, status, method, providerID, expiresAt))
 }
 
 func expectMarkPaidSuccess(mock sqlmock.Sqlmock, outTradeNo, method, providerID string, amount, beforeBalance float64) {
