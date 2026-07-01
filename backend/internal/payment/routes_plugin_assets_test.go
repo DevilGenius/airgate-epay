@@ -650,6 +650,15 @@ func TestAdminProviderHandlers(t *testing.T) {
 		if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"ok":true`) {
 			t.Fatalf("delete response: code=%d body=%s", rec.Code, rec.Body.String())
 		}
+
+		mock.ExpectExec("DELETE FROM payment_provider_configs").WithArgs("cai/hong").WillReturnResult(sqlmock.NewResult(0, 1))
+		mock.ExpectQuery("SELECT id, kind, enabled, config, created_at, updated_at").
+			WillReturnRows(sqlmock.NewRows([]string{"id", "kind", "enabled", "config", "created_at", "updated_at"}))
+		rec = httptest.NewRecorder()
+		p.handleAdminDeleteProvider(rec, httptest.NewRequest(http.MethodDelete, "/admin/providers/cai%2Fhong", nil))
+		if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"ok":true`) {
+			t.Fatalf("delete encoded response: code=%d body=%s", rec.Code, rec.Body.String())
+		}
 		assertSQLExpectations(t, mock)
 	})
 
@@ -666,6 +675,12 @@ func TestAdminProviderHandlers(t *testing.T) {
 		p.handleAdminDeleteProvider(rec, httptest.NewRequest(http.MethodDelete, "/admin/providers/cai", nil))
 		if rec.Code != http.StatusInternalServerError || !strings.Contains(rec.Body.String(), "delete failed") {
 			t.Fatalf("delete error response: code=%d body=%s", rec.Code, rec.Body.String())
+		}
+		mock.ExpectExec("DELETE FROM payment_provider_configs").WithArgs("missing").WillReturnResult(sqlmock.NewResult(0, 0))
+		rec = httptest.NewRecorder()
+		p.handleAdminDeleteProvider(rec, httptest.NewRequest(http.MethodDelete, "/admin/providers/missing", nil))
+		if rec.Code != http.StatusNotFound || !strings.Contains(rec.Body.String(), "provider config not found") {
+			t.Fatalf("delete missing response: code=%d body=%s", rec.Code, rec.Body.String())
 		}
 		mock.ExpectExec("DELETE FROM payment_provider_configs").WithArgs("cai").WillReturnResult(sqlmock.NewResult(0, 1))
 		mock.ExpectQuery("SELECT id, kind, enabled, config, created_at, updated_at").WillReturnError(errors.New("reload failed"))

@@ -65,6 +65,12 @@ func TestStoreMigrateUpsertAndDelete(t *testing.T) {
 		t.Fatalf("Delete error: %v", err)
 	}
 	mock.ExpectExec("DELETE FROM payment_provider_configs").
+		WithArgs("missing").
+		WillReturnResult(sqlmock.NewResult(0, 0))
+	if err := store.Delete(context.Background(), "missing"); !errors.Is(err, ErrProviderConfigNotFound) {
+		t.Fatalf("Delete missing error = %v", err)
+	}
+	mock.ExpectExec("DELETE FROM payment_provider_configs").
 		WithArgs("main").
 		WillReturnError(errors.New("delete failed"))
 	if err := store.Delete(context.Background(), "main"); err == nil || !strings.Contains(err.Error(), "删除 provider 配置失败") {
@@ -154,10 +160,10 @@ func TestStoreNextIDForKind(t *testing.T) {
 	mock.ExpectQuery("SELECT id FROM payment_provider_configs WHERE id LIKE").
 		WithArgs(KindEpayXunhu + "_%").
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).
-			AddRow(KindEpayXunhu+"_1").
-			AddRow(KindEpayXunhu+"_09").
-			AddRow(KindEpayXunhu+"_backup").
-			AddRow(KindEpayXunhu+"_0"))
+			AddRow(KindEpayXunhu + "_1").
+			AddRow(KindEpayXunhu + "_09").
+			AddRow(KindEpayXunhu + "_backup").
+			AddRow(KindEpayXunhu + "_0"))
 	got, err := store.NextIDForKind(context.Background(), KindEpayXunhu)
 	if err != nil {
 		t.Fatalf("NextIDForKind error: %v", err)

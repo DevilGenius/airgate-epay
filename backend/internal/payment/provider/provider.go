@@ -127,4 +127,7 @@ var (
 
 	// ErrNoProviderAvailable Router 找不到任何可用 Provider 来处理这个 method
 	ErrNoProviderAvailable = errors.New("no available payment provider")
+
+	// ErrProviderConfigNotFound 删除或读取 Provider 配置时目标不存在
+	ErrProviderConfigNotFound = errors.New("provider config not found")
 )

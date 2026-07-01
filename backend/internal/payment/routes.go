@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -366,7 +368,21 @@ func (p *Plugin) handleAdminDeleteProvider(w http.ResponseWriter, r *http.Reques
 		writeJSONErr(w, http.StatusBadRequest, "缺少 provider id")
 		return
 	}
-	if err := p.store.Delete(r.Context(), id); err != nil {
+	decodedID, err := url.PathUnescape(id)
+	if err != nil {
+		writeJSONErr(w, http.StatusBadRequest, "provider id 编码无效")
+		return
+	}
+	decodedID = strings.TrimSpace(decodedID)
+	if decodedID == "" || decodedID == "reload" {
+		writeJSONErr(w, http.StatusBadRequest, "缺少 provider id")
+		return
+	}
+	if err := p.store.Delete(r.Context(), decodedID); err != nil {
+		if errors.Is(err, provider.ErrProviderConfigNotFound) {
+			writeJSONErr(w, http.StatusNotFound, err.Error())
+			return
+		}
 		writeJSONErr(w, http.StatusInternalServerError, err.Error())
 		return
 	}

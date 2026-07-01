@@ -258,9 +258,16 @@ func (s *Store) Rename(ctx context.Context, oldID, newID string) error {
 
 // Delete 删除一个 Provider 配置
 func (s *Store) Delete(ctx context.Context, id string) error {
-	_, err := s.db.ExecContext(ctx, `DELETE FROM payment_provider_configs WHERE id = $1`, id)
+	res, err := s.db.ExecContext(ctx, `DELETE FROM payment_provider_configs WHERE id = $1`, id)
 	if err != nil {
 		return fmt.Errorf("删除 provider 配置失败: %w", err)
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("读取 provider 删除结果失败: %w", err)
+	}
+	if affected == 0 {
+		return fmt.Errorf("%w: %s", ErrProviderConfigNotFound, id)
 	}
 	return nil
 }
