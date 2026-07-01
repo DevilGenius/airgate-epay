@@ -110,6 +110,11 @@ func (s *Service) CreateOrder(ctx context.Context, in CreateOrderInput) (*Order,
 	if in.UserID <= 0 {
 		return nil, errors.New("缺少用户身份")
 	}
+	amount, err := normalizePaymentAmount(in.Amount)
+	if err != nil {
+		return nil, err
+	}
+	in.Amount = amount
 	if in.Amount < s.minAmount {
 		return nil, fmt.Errorf("金额低于最低限额 %.2f", s.minAmount)
 	}
@@ -708,4 +713,15 @@ func absDiff(a, b float64) float64 {
 		return a - b
 	}
 	return b - a
+}
+
+func normalizePaymentAmount(amount float64) (float64, error) {
+	if amount <= 0 || math.IsNaN(amount) || math.IsInf(amount, 0) {
+		return 0, errors.New("金额必须为有限正数")
+	}
+	cents := math.Round(amount * 100)
+	if math.Abs(amount*100-cents) > 1e-9 {
+		return 0, errors.New("金额最多支持两位小数")
+	}
+	return cents / 100, nil
 }

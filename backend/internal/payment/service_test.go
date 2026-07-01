@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"math"
 	"reflect"
 	"strings"
 	"testing"
@@ -83,6 +84,9 @@ func TestCreateOrderValidation(t *testing.T) {
 		want string
 	}{
 		{name: "missing user", in: CreateOrderInput{UserID: 0, Amount: 20}, want: "缺少用户身份"},
+		{name: "zero amount", in: CreateOrderInput{UserID: 1, Amount: 0}, want: "金额必须为有限正数"},
+		{name: "nan amount", in: CreateOrderInput{UserID: 1, Amount: math.NaN()}, want: "金额必须为有限正数"},
+		{name: "too many decimals", in: CreateOrderInput{UserID: 1, Amount: 10.001}, want: "金额最多支持两位小数"},
 		{name: "below min", in: CreateOrderInput{UserID: 1, Amount: 9.99}, want: "金额低于最低限额"},
 		{name: "above max", in: CreateOrderInput{UserID: 1, Amount: 101}, want: "金额超过最高限额"},
 	}
@@ -160,6 +164,9 @@ func TestCreateOrderSuccessAndFailureBranches(t *testing.T) {
 				}
 				if in.ExpireSeconds != 1800 || in.ClientIP != "1.2.3.4" || in.Subject != "余额充值" {
 					t.Fatalf("provider input mismatch: %+v", in)
+				}
+				if in.Amount != 30 {
+					t.Fatalf("provider amount = %v", in.Amount)
 				}
 				return &provider.CreateOrderResult{PaymentURL: "https://pay.example.com", QRCodeContent: "qr"}, nil
 			},
