@@ -344,6 +344,20 @@ func (s *Service) markPaid(ctx context.Context, callbackProviderID string, cb *p
 	if err != nil {
 		return fmt.Errorf("锁用户失败: %w", err)
 	}
+	if s.dailyLimit > 0 {
+		var paidToday float64
+		err = tx.QueryRowContext(ctx, `
+			SELECT COALESCE(SUM(amount), 0) FROM payment_orders
+			WHERE user_id = $1 AND status = 'paid'
+			  AND paid_at >= date_trunc('day', NOW())
+		`, userID).Scan(&paidToday)
+		if err != nil {
+			return fmt.Errorf("查询日累失败: %w", err)
+		}
+		if paidToday+amount > s.dailyLimit {
+			return fmt.Errorf("超过单日充值上限 %.2f（今日已 %.2f）", s.dailyLimit, paidToday)
+		}
+	}
 	afterBalance := beforeBalance + amount
 	if _, err := tx.ExecContext(ctx, `UPDATE users SET balance = $1, updated_at = NOW() WHERE id = $2`, afterBalance, userID); err != nil {
 		s.logger.Error("payment_balance_update_failed",

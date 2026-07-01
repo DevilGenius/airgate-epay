@@ -405,6 +405,24 @@ func TestMarkPaidBranches(t *testing.T) {
 		assertSQLExpectations(t, mock)
 	})
 
+	t.Run("daily limit rechecked during settlement", func(t *testing.T) {
+		svc, _, db, mock := newMockService(t, ServiceOptions{DailyLimit: 100})
+		defer func() { _ = db.Close() }()
+		mock.ExpectBegin()
+		expectOrderLock(mock, "AG1", "pending", provider.MethodAlipay, "fake", 20)
+		mock.ExpectQuery("SELECT balance FROM users").WithArgs(int64(7)).
+			WillReturnRows(sqlmock.NewRows([]string{"balance"}).AddRow(5.0))
+		mock.ExpectQuery("SELECT COALESCE\\(SUM\\(amount\\), 0\\) FROM payment_orders").
+			WithArgs(int64(7)).
+			WillReturnRows(sqlmock.NewRows([]string{"sum"}).AddRow(90.0))
+		mock.ExpectRollback()
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		if err == nil || !strings.Contains(err.Error(), "超过单日充值上限") {
+			t.Fatalf("markPaid daily limit error = %v", err)
+		}
+		assertSQLExpectations(t, mock)
+	})
+
 	t.Run("balance update error", func(t *testing.T) {
 		svc, _, db, mock := newMockService(t, ServiceOptions{})
 		defer func() { _ = db.Close() }()
