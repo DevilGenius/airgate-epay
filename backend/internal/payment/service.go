@@ -257,7 +257,7 @@ func (s *Service) HandleCallback(ctx context.Context, providerID string, req pro
 		"status", res.Status,
 	)
 	if res.Status == "paid" {
-		if err := s.markPaid(ctx, res); err != nil {
+		if err := s.markPaid(ctx, providerID, res); err != nil {
 			s.logger.Error("payment_record_persist_failed",
 				"out_trade_no", res.OutTradeNo,
 				"provider", providerID,
@@ -273,7 +273,7 @@ func (s *Service) HandleCallback(ctx context.Context, providerID string, req pro
 //
 // 幂等保证：先 SELECT ... FOR UPDATE 锁住订单行，看到 status='paid' 直接返回。
 // 金额校验：用回调金额与订单金额比对，防止假回调。
-func (s *Service) markPaid(ctx context.Context, cb *provider.CallbackResult) error {
+func (s *Service) markPaid(ctx context.Context, callbackProviderID string, cb *provider.CallbackResult) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -310,6 +310,9 @@ func (s *Service) markPaid(ctx context.Context, cb *provider.CallbackResult) err
 	}
 	if status != "pending" {
 		return fmt.Errorf("订单状态不允许标记为 paid: %s", status)
+	}
+	if providerID != callbackProviderID {
+		return fmt.Errorf("回调 provider %s 与订单 provider %s 不匹配", callbackProviderID, providerID)
 	}
 
 	// 2) 金额校验（允许 1 分钱误差）

@@ -292,7 +292,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		svc, _, db, mock := newMockService(t, ServiceOptions{})
 		defer func() { _ = db.Close() }()
 		mock.ExpectBegin().WillReturnError(errors.New("begin failed"))
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1"})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1"})
 		if err == nil || !strings.Contains(err.Error(), "开启事务失败") {
 			t.Fatalf("markPaid begin error = %v", err)
 		}
@@ -306,7 +306,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectQuery("SELECT id, user_id, amount, status, method, provider_id FROM payment_orders").
 			WithArgs("AG1").WillReturnError(sql.ErrNoRows)
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1"})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1"})
 		if err == nil || !strings.Contains(err.Error(), "锁订单失败") {
 			t.Fatalf("markPaid lock order error = %v", err)
 		}
@@ -319,7 +319,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectBegin()
 		expectOrderLock(mock, "AG1", "paid", provider.MethodAlipay, "fake", 20)
 		mock.ExpectRollback()
-		if err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20}); err != nil {
+		if err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20}); err != nil {
 			t.Fatalf("markPaid idempotent error: %v", err)
 		}
 		assertSQLExpectations(t, mock)
@@ -331,9 +331,22 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectBegin()
 		expectOrderLock(mock, "AG1", "failed", provider.MethodAlipay, "fake", 20)
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
 		if err == nil || !strings.Contains(err.Error(), "订单状态不允许") {
 			t.Fatalf("markPaid invalid status error = %v", err)
+		}
+		assertSQLExpectations(t, mock)
+	})
+
+	t.Run("provider mismatch", func(t *testing.T) {
+		svc, _, db, mock := newMockService(t, ServiceOptions{})
+		defer func() { _ = db.Close() }()
+		mock.ExpectBegin()
+		expectOrderLock(mock, "AG1", "pending", provider.MethodAlipay, "fake", 20)
+		mock.ExpectRollback()
+		err := svc.markPaid(context.Background(), "other", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		if err == nil || !strings.Contains(err.Error(), "provider") || !strings.Contains(err.Error(), "不匹配") {
+			t.Fatalf("markPaid provider mismatch error = %v", err)
 		}
 		assertSQLExpectations(t, mock)
 	})
@@ -344,7 +357,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectBegin()
 		expectOrderLock(mock, "AG1", "pending", provider.MethodAlipay, "fake", 20)
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 21})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 21})
 		if err == nil || !strings.Contains(err.Error(), "不匹配") {
 			t.Fatalf("markPaid amount mismatch error = %v", err)
 		}
@@ -358,7 +371,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		expectOrderLock(mock, "AG1", "pending", provider.MethodAlipay, "fake", 20)
 		mock.ExpectQuery("SELECT balance FROM users").WithArgs(int64(7)).WillReturnError(errors.New("user missing"))
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
 		if err == nil || !strings.Contains(err.Error(), "锁用户失败") {
 			t.Fatalf("markPaid user lock error = %v", err)
 		}
@@ -373,7 +386,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectQuery("SELECT balance FROM users").WithArgs(int64(7)).WillReturnRows(sqlmock.NewRows([]string{"balance"}).AddRow(5.0))
 		mock.ExpectExec("UPDATE users SET balance").WithArgs(25.0, int64(7)).WillReturnError(errors.New("update failed"))
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
 		if err == nil || !strings.Contains(err.Error(), "更新余额失败") {
 			t.Fatalf("markPaid balance update error = %v", err)
 		}
@@ -389,7 +402,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectExec("UPDATE users SET balance").WithArgs(25.0, int64(7)).WillReturnResult(sqlmock.NewResult(0, 1))
 		mock.ExpectExec("INSERT INTO balance_logs").WithArgs(20.0, 5.0, 25.0, "在线充值（custom）", int64(7)).WillReturnError(errors.New("log failed"))
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
 		if err == nil || !strings.Contains(err.Error(), "写 balance_logs 失败") {
 			t.Fatalf("markPaid balance log error = %v", err)
 		}
@@ -406,7 +419,7 @@ func TestMarkPaidBranches(t *testing.T) {
 		mock.ExpectExec("INSERT INTO balance_logs").WithArgs(20.0, 5.0, 25.0, "在线充值（支付宝）", int64(7)).WillReturnResult(sqlmock.NewResult(0, 1))
 		mock.ExpectExec("UPDATE payment_orders").WithArgs(sqlmock.AnyArg(), int64(1)).WillReturnError(errors.New("order update failed"))
 		mock.ExpectRollback()
-		err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
+		err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20})
 		if err == nil || !strings.Contains(err.Error(), "更新订单状态失败") {
 			t.Fatalf("markPaid order update error = %v", err)
 		}
@@ -614,7 +627,7 @@ func TestMarkPaidSerializesRawPayload(t *testing.T) {
 		}), int64(1)).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
-	if err := svc.markPaid(context.Background(), &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20, Raw: raw}); err != nil {
+	if err := svc.markPaid(context.Background(), "fake", &provider.CallbackResult{OutTradeNo: "AG1", Amount: 20, Raw: raw}); err != nil {
 		t.Fatalf("markPaid error: %v", err)
 	}
 	assertSQLExpectations(t, mock)
