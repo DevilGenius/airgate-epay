@@ -70,6 +70,8 @@ type Service struct {
 	mu          sync.Mutex // 串行化 markPaid 减少同订单并发回调争用
 }
 
+const paymentAmountCentEpsilon = 1e-6
+
 // NewService 构造 Service
 func NewService(logger *slog.Logger, db *sql.DB, registry *provider.Registry, opts ServiceOptions) *Service {
 	return &Service{
@@ -720,7 +722,7 @@ func normalizePaymentAmount(amount float64) (float64, error) {
 		return 0, errors.New("金额必须为有限正数")
 	}
 	cents := math.Round(amount * 100)
-	if math.Abs(amount*100-cents) > 1e-9 {
+	if math.Abs(amount*100-cents) > paymentAmountCentEpsilon {
 		return 0, errors.New("金额最多支持两位小数")
 	}
 	return cents / 100, nil

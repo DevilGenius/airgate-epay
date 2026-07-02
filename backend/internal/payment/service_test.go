@@ -598,6 +598,30 @@ func TestAvailableMethodsExpireAndHelpers(t *testing.T) {
 	}
 }
 
+func TestNormalizePaymentAmountAllowsFloatNoise(t *testing.T) {
+	a := 0.1
+	b := 0.2
+	got, err := normalizePaymentAmount(a + b)
+	if err != nil {
+		t.Fatalf("normalizePaymentAmount(0.1+0.2) error = %v", err)
+	}
+	if got != 0.3 {
+		t.Fatalf("normalizePaymentAmount(0.1+0.2) = %.17g, want 0.3", got)
+	}
+
+	got, err = normalizePaymentAmount(10.01 + 5e-10)
+	if err != nil {
+		t.Fatalf("normalizePaymentAmount(tiny cent noise) error = %v", err)
+	}
+	if got != 10.01 {
+		t.Fatalf("normalizePaymentAmount(tiny cent noise) = %.17g, want 10.01", got)
+	}
+
+	if _, err := normalizePaymentAmount(10.001); err == nil || !strings.Contains(err.Error(), "金额最多支持两位小数") {
+		t.Fatalf("normalizePaymentAmount(10.001) error = %v, want two-decimal rejection", err)
+	}
+}
+
 func expectOrderLock(mock sqlmock.Sqlmock, outTradeNo, status, method, providerID string, amount float64) {
 	expectOrderLockWithExpiry(mock, outTradeNo, status, method, providerID, amount, time.Now().Add(time.Hour))
 }
