@@ -300,12 +300,13 @@ func (s *Service) markPaid(ctx context.Context, callbackProviderID string, cb *p
 		method     string
 		providerID string
 		expiresAt  time.Time
+		dbNow      time.Time
 	)
 	err = tx.QueryRowContext(ctx, `
-		SELECT id, user_id, amount, status, method, provider_id, expires_at FROM payment_orders
+		SELECT id, user_id, amount, status, method, provider_id, expires_at, NOW() FROM payment_orders
 		WHERE out_trade_no = $1
 		FOR UPDATE
-	`, cb.OutTradeNo).Scan(&orderID, &userID, &amount, &status, &method, &providerID, &expiresAt)
+	`, cb.OutTradeNo).Scan(&orderID, &userID, &amount, &status, &method, &providerID, &expiresAt, &dbNow)
 	if err != nil {
 		return fmt.Errorf("锁订单失败: %w", err)
 	}
@@ -320,7 +321,7 @@ func (s *Service) markPaid(ctx context.Context, callbackProviderID string, cb *p
 	if status != "pending" {
 		return fmt.Errorf("订单状态不允许标记为 paid: %s", status)
 	}
-	if !expiresAt.After(time.Now()) {
+	if !expiresAt.After(dbNow) {
 		if _, err := tx.ExecContext(ctx, `
 			UPDATE payment_orders
 			SET status = 'expired', updated_at = NOW()
