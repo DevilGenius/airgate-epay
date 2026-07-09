@@ -22,6 +22,8 @@ tmp/
 
 # Frontend
 web/node_modules/
+web/.pnpm-store/
+web/.pnpm-store-tmp/
 web/dist/
 backend/internal/payment/webdist/
 
